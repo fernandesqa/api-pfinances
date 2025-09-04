@@ -1,0 +1,1477 @@
+openapi: 3.0.3
+info:
+  title: PFinances
+  description: |-
+    Documentação da API do portal PFinances
+  contact:
+    email: lucas@fernandesme.com.br
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://localhost/
+tags:
+  - name: Convite
+  - name: Primeiro Acesso
+  - name: Usuários
+  - name: Pendências
+  - name: Receitas
+paths:
+  /invite:
+    post:
+      tags:
+        - Convite
+      summary: Validar convite
+      description: Valida o convite do titular e/ou do dependente
+      requestBody:
+        description: Valida o convite do titular e/ou do dependente
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Invite'
+          application/xml:
+              schema:
+                $ref: '#/components/schemas/Invite'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InviteValidated'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InviteValidated'
+        '400':
+          description: Invalid data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InviteInvalidData'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InviteInvalidData'
+  /generate-invite:
+    post:
+      tags:
+        - Convite
+      summary: Gera convite de dependentes
+      description: Gera o convite de um dependente
+      requestBody:
+        description: Dados para gerar o pré-cadastro e gerar o convite
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateInvite'
+          application/xml:
+              schema:
+                $ref: '#/components/schemas/GenerateInvite'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InviteGenerated'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InviteGenerated'
+        '403':
+          description: Email in use
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailInUse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/EmailInUse'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+  /family-invites/users/{userId}/families/{familyId}:
+    get:
+      tags:
+        - Convite
+      summary: Busca todos os invites de uma família
+      description: Realiza a busca dos invites de uma família na base de dados
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FamilyInvites'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FamilyInvites'
+        '404':
+          description: Nenhum dado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+  /holder-first-access:
+    post:
+      tags: 
+        - Primeiro Acesso
+      summary: Primeiro acesso do titular
+      description: Realiza o primeiro acesso do titular
+      requestBody: 
+        description: Realiza o primeiro acesso do titular
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HolderFirstAccess'
+          application/xml:
+              schema:
+                $ref: '#/components/schemas/HolderFirstAccess'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FirstAccessValidated'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FirstAccessValidated'
+        '409':
+          description: Conflict of data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FirstAccessConflict'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FirstAccessConflict'
+                
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /auth:
+    post:
+      tags:
+        - Usuários
+      summary: Realiza a autenticação de acesso
+      description: Realiza a autenticação de um usuário no portal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserAuth'
+      responses:
+        '200':
+          description: Login realizado com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAuthSuccess'
+                
+        '403':
+          description: Dados inválidos!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAuthFailure'
+                
+  /session:
+    delete:
+      tags:
+        - Usuários
+      summary: Exclui uma sessão
+      description: Exclui uma sessão na base de dados
+      parameters:
+        - name: id
+          description: id do usuário
+          required: true
+          in: query
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Sessão Excluída Com Sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionDeleted'
+                
+        '500':
+          description: Erro ao Excluir Sessão
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionDeleteError'
+                
+  /users/{userId}/families/{familyId}:
+    get:
+      tags:
+        - Usuários
+      summary: Consulta de usuários
+      description: Realiza a consulta dos usuários de uma família
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Users'
+        '404':
+          description: Nenhum dado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+                
+  /dependent-first-access:
+    post:
+      tags:
+        - Primeiro Acesso
+      summary: Primeiro acesso do dependente
+      description: Realiza o primeiro acesso do dependente
+      requestBody: 
+        description: Realiza o primeiro acesso do titular
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DependentFirstAccess'
+          application/xml:
+              schema:
+                $ref: '#/components/schemas/DependentFirstAccess'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FirstAccessValidated'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FirstAccessValidated'
+        '409':
+          description: Conflict of data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FirstAccessConflict'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FirstAccessConflict'
+                
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /pending-issues-notification/users/{userId}:
+    get:
+      tags:
+        - Pendências
+      summary: Consulta de notificações
+      description: Realiza a consulta de notificação para indicar se o modal de criação de pendências ou modal de reset deve ser exibido
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingIssuesNotification'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/PendingIssuesNotification'
+                
+        '404':
+          description: Nenhum dado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+        
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /pending-issues-notification-creation:
+    put:
+      tags:
+        - Pendências
+      summary: Atualiza o valor da notificação de criação de pendências 
+      description: Realiza a atualização do valor referente à exibição de notificação de criação de pendências
+      requestBody: 
+        description: Realiza a atualização do dado na base
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PendingIssuesNotificationCreation'
+          application/xml:
+              schema:
+                $ref: '#/components/schemas/PendingIssuesNotificationCreation'
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSuccess'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UpdateSuccess'
+                
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /pending-issues-notification-reset:
+    put:
+      tags:
+        - Pendências
+      summary: Atualiza o valor da notificação de reset de pendências 
+      description: Realiza a atualização do valor referente à exibição de notificação de reset de pendências
+      requestBody: 
+        description: Realiza a atualização do dado na base
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PendingIssuesNotificationReset'
+          application/xml:
+              schema:
+                $ref: '#/components/schemas/PendingIssuesNotificationReset'
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSuccess'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UpdateSuccess'
+                
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /create-pending-issues/users/{userId}:
+    post:
+      tags:
+        - Pendências
+      summary: Cadastra novas pendências na base
+      description: Realiza o cadastro de novas pendências na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody: 
+        description: Realiza o primeiro acesso do titular
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePendingIssues'
+          application/xml:
+              schema:
+                $ref: '#/components/schemas/CreatePendingIssues'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingIssuesCreated'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/PendingIssuesCreated'
+      
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /pending-issues/users/{userId}/current-month:
+    get:
+      tags:
+        - Pendências
+      summary: Consulta as pendências do mês e ano atual
+      description: Realiza a consulta de pendências do mês e ano atual na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingIssuesCurrentMonth'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/PendingIssuesCurrentMonth'
+                
+        '404':
+          description: Nenhum dado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+        
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /pending-issues/users/{userId}/total:
+    get:
+      tags:
+        - Pendências
+      summary: Consulta a quantidade total de pendências do usuário
+      description: Realiza a consulta da quantidade total de pendências do usuário na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotalUserPendingIssues'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/TotalUserPendingIssues'
+                
+        '404':
+          description: Nenhum dado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+        
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /pending-issues/users/{userId}/update-status:
+    patch:
+      tags:
+        - Pendências
+      summary: Atualiza o status de uma ou mais pendências
+      description: Realiza a atualização de uma ou mais pendências na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody: 
+        description: Realiza a atualização de uma ou mais pendências na base
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PendingIssuesUpdateStatus'
+          application/xml:
+              schema:
+                $ref: '#/components/schemas/PendingIssuesUpdateStatus'
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSuccess'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UpdateSuccess'
+                
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /pending-issues/users/{userId}/update-description:
+    put:
+      tags:
+        - Pendências
+      summary: Atualiza os dados de uma ou mais pendências
+      description: Realiza a atualização de uma ou mais pendências na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody: 
+        description: Realiza a atualização de uma ou mais pendências na base
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PendingIssuesUpdateDescription'
+          application/xml:
+              schema:
+                $ref: '#/components/schemas/PendingIssuesUpdateDescription'
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSuccess'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UpdateSuccess'
+                
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /pending-issues/users/{userId}/pending-issues-id/{id}/delete:
+    delete:
+      tags:
+        - Pendências
+      summary: Exclui uma determinada pendência
+      description: Realiza a exclusão de uma determinada pendência na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Operation success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExclusionSuccess'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ExclusionSuccess'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /pending-issues/users/{userId}/reset:
+    put:
+      tags:
+        - Pendências
+      summary: Reinicia as pendências
+      description: Reinicia as pendências na base para o mês e ano atual
+      parameters:
+         - name: userId
+           in: path
+           required: true
+           schema:
+            type: integer
+            format: int64
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSuccess'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UpdateSuccess'
+                
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /pending-issues-history/users/{userId}/years:
+    get:
+      tags:
+        - Pendências
+      summary: Lista os anos cadastrados na base vinculados ao id do usuário
+      description: Realiza a consulta dos anos cadastrados na base vinculados ao id do usuário
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListYears'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ListYears'
+                
+        '404':
+          description: Nenhum dado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+                
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /pending-issues-history/users/{userId}/years/{year}/months:
+    get:
+      tags:
+        - Pendências
+      summary: Lista os meses cadastrados na base vinculados ao id do usuário
+      description: Realiza a consulta dos meses cadastrados na base vinculados ao id do usuário
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListMonths'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ListMonths'
+                
+        '404':
+          description: Nenhum dado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+                
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /pending-issues-history/users/{userId}/periods/{monthYear}/data:
+    get:
+      tags:
+        - Pendências
+      summary: Lista os meses cadastrados na base vinculados ao id do usuário
+      description: Realiza a consulta dos meses cadastrados na base vinculados ao id do usuário
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: monthYear
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingIssues'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/PendingIssues'
+                
+        '404':
+          description: Nenhum dado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+        
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /pending-issues-history/users/{userId}/total:
+    get:
+      tags:
+        - Pendências
+      summary: Consulta a quantidade total de pendências do usuário
+      description: Realiza a consulta da quantidade total de pendências do usuário na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotalUserPendingIssues'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/TotalUserPendingIssues'
+                
+        '404':
+          description: Nenhum dado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+        
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+  
+  /revenues/users/{userId}/periods/{monthYear}/create:
+    post:
+      tags:
+        - Receitas
+      summary: Cadastra uma nova receita
+      description: Realiza o cadastro de uma nova receita na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: monthYear
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Realiza o cadastro de uma nova receita na base
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRevenue'
+          application/xml:
+              schema:
+                $ref: '#/components/schemas/CreateRevenue'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RevenueCreated'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/RevenueCreated'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /revenues/users/{userId}/families/{familyId}/last-month:
+    get:
+      tags:
+        - Receitas
+      summary: Consulta as receitas do mês anterior
+      description: Realiza a consulta de receitas do mês anterior na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Revenues'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Revenues'
+                
+        '404':
+          description: Nenhum dado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+        
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            
+  /revenues/users/{userId}/families/{familyId}/current-month:
+    get:
+      tags:
+        - Receitas
+      summary: Consulta o total de receitas do mês atual
+      description: Realiza a consulta do total de receitas do mês atual na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotalRevenue'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/TotalRevenue'
+                
+        '404':
+          description: Nenhum dado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+        
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+          
+    
+components:
+  schemas:
+    Invite:
+      type: object
+      properties:
+        role:
+          type: string
+        inviteCode:
+          type: string
+        emailAddress:
+          type: string
+    
+    InviteValidated:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Convite validado
+    
+    InviteInvalidData:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Dados inválidos
+          
+    GenerateInvite:
+      type: object
+      properties:
+        userId:
+          type: number
+        familyId:
+          type: number
+        emailAddress:
+          type: string
+          
+    InviteGenerated:
+      type: object
+      properties:
+        inviteCode:
+          type: string
+          example: ULI2024GOM
+        emailAddress:
+          type: string
+          example: ulisses.gomes@teste.com
+          
+    EmailInUse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: E-mail em uso
+          
+    FamilyInvites:
+      type: object
+      properties:
+        data:
+          type: array
+          items: 
+            type: object
+            properties:
+              familyInviteCode:
+                type: string
+                example: WEV2024FON
+              familyInviteEmail:
+                type: string
+                example: teste@teste.com
+              familyInviteUsed:
+                type: boolean
+        total:
+          type: number
+          example: 1
+              
+    
+    DataNotFound:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Nenhum registro encontrado
+    
+    HolderFirstAccess:
+      type: object
+      properties:
+        name:
+          type: string
+        emailAddress:
+          type: string
+        password:
+          type: string
+        familyName:
+          type: string
+          
+    FirstAccessValidated:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Primeiro acesso realizado
+          
+    FirstAccessConflict:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Primeiro acesso já realizado
+    
+    DependentFirstAccess:
+      type: object
+      properties:
+        name:
+          type: string
+        emailAddress:
+          type: string
+        password:
+          type: string
+          
+    InternalError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Erro interno, por favor tente novamente mais tarde
+          
+    UserAuth:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+          
+    UserAuthSuccess:
+      type: object
+      properties:
+        message: 
+          type: string
+          example: Login realizado com sucesso!
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        accessToken:
+          type: string
+        expireAt:
+          type: number
+          
+          
+    UserAuthFailure:
+      type: object
+      properties:
+        message: 
+          type: string
+          example: Dados inválidos!
+        password: 
+          type: string
+          
+    SessionDeleted:
+      type: object
+      properties:
+        message: 
+          type: string
+          example: Sessão Excluída Com Sucesso
+          
+    SessionDeleteError:
+      type: object
+      properties:
+        message: 
+          type: string
+          example: Erro ao Excluir Sessão
+          
+    Users:
+      type: object
+      properties:
+        data:
+          type: array
+          items: 
+            type: object
+            properties:
+              name:
+                type: string
+              emailAddress:
+                type: string
+                example: teste@teste.com
+              role:
+                type: string
+              firstAccess:
+                type: boolean
+        total:
+          type: number
+          example: 1
+          
+    PendingIssuesNotification:
+      type: object
+      properties:
+        data:
+          type: array
+          items: 
+            type: object
+            properties:
+              pendingIssuesNotificationCreation:
+                type: boolean
+              pendingIssuesNotificationReset:
+                type: boolean
+                
+    PendingIssuesNotificationCreation:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: 1
+        notificateCreation:
+          type: boolean
+          example: false
+          
+    UpdateSuccess:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Atualização realizada com sucesso.
+          
+    PendingIssuesNotificationReset:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: 1
+        notificateReset:
+          type: boolean
+          example: false
+          
+    PendingIssues:
+      type: object
+      properties:
+        data:
+          type: array
+          items: 
+            type: object
+            properties:
+              pendingIssueId:
+                type: number
+              pendingIssueDescription:
+                type: string
+              done:
+                type: boolean
+                
+    CreatePendingIssues:
+      type: object
+      properties:
+        pendingIssues:
+          type: array
+          items:
+            properties:
+              pendingIssueDescription:
+                type: string
+          
+    PendingIssuesCreated:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Pendência cadastrada com sucesso
+          
+    PendingIssuesCurrentMonth:
+      type: object
+      properties:
+        data:
+          type: array
+          items: 
+            type: object
+            properties:
+              pendingIssueId:
+                type: number
+              pendingIssueDescription:
+                type: string
+              done:
+                type: boolean
+        pendings:
+          type: number
+        total:
+          type: number
+          example: 1
+          
+    TotalUserPendingIssues:
+      type: object
+      properties:
+        total:
+          type: number
+          example: 5
+          
+    PendingIssuesUpdateStatus:
+      type: object
+      properties:
+        pendingIssues:
+          type: array
+          items:
+            type: object
+            properties:
+              pendingIssueId:
+                type: number
+                example: 2
+              done:
+                type: boolean
+                
+    PendingIssuesUpdateDescription:
+      type: object
+      properties:
+        pendingIssues:
+          type: array
+          items:
+            type: object
+            properties:
+              pendingIssueId:
+                type: number
+                example: 2
+              pendingIssueDescription:
+                type: string
+              done:
+                type: boolean
+                example: false
+    
+    ExclusionSuccess:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Exclusão realizada com sucesso
+          
+    ListYears:
+      type: object
+      properties:
+        years:
+          type: array
+          items:
+            type: object
+            properties:
+              year:
+                type: string
+                example: 2024
+                
+    ListMonths:
+      type: object
+      properties:
+        months:
+          type: array
+          items:
+            type: object
+            properties:
+              month:
+                type: string
+                example: Novembro
+                
+    CreateRevenue:
+      type: object
+      properties:
+        revenues:
+          type: array
+          items:
+            type: object
+            properties:
+              description:
+                type: string
+              value:
+                type: number
+                example: 50679.80
+                
+    RevenueCreated:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Receita cadastrada com sucesso
+          
+    Revenues:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              description:
+                type: string
+              value:
+                type: integer
+                example: 5600.50
+                
+    TotalRevenue:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              month:
+                type: string
+                example: 10
+              year:
+                type: string
+                example: 2024
+              value:
+                type: integer
+                example: 5600.50
