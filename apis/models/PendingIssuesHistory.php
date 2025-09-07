@@ -86,17 +86,24 @@
 
         public function readMonths() {
             $query = 'SELECT 
-                        DISTINCT(SUBSTRING(Pending_Issues_Month_Year, 1, 2)) AS MONTH 
+                        DISTINCT
+                        IF(
+                            LENGTH(Pending_Issues_Month_Year) = 5, 
+                            SUBSTRING(Pending_Issues_Month_Year, 1, 1), 
+                            SUBSTRING(Pending_Issues_Month_Year, 1, 2)
+                        ) AS MONTH
                     FROM '.$this->table.' 
                     WHERE User_ID = :user_id 
-                    AND SUBSTRING(Pending_Issues_Month_Year, 3, 6) = :year';
+                    AND Pending_Issues_Month_Year LIKE :year';
 
             //PREPARA A QUERY
             $stmt = $this->conn->prepare($query);
 
+            $year = '%' . $this->Pending_Issues_Month_Year;
+
             //LIGA OS DADOS 
             $stmt->bindParam(':user_id', $this->User_ID);
-            $stmt->bindParam(':year', $this->Pending_Issues_Month_Year);
+            $stmt->bindParam(':year', $year);
 
             //EXECUTA A QUERY
             $stmt->execute();
