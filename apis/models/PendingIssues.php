@@ -249,5 +249,25 @@
             printf("Error: %s.\n", $stmt->error);
             return false;
         }
+
+        public function readUserPendingIssues() {
+            $query = 'SELECT 
+                        Pending_Issues_ID, 
+                        Pending_Issues_Description 
+                      FROM 
+                        '.$this->table.' 
+                      WHERE user_id = :user_id';
+            
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS 
+            $stmt->bindParam(':user_id', $this->User_ID);
+
+            //EXECUTA A QUERY
+            $stmt->execute();
+
+            return $stmt;
+        }
     }
 ?>

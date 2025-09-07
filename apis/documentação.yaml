@@ -483,6 +483,50 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalError'
                 
+  /pending-issues/users/{userId}:
+    get:
+      tags:
+        - Pendências
+      summary: Consulta as pendências cadastradas pelo usuário
+      description: Realiza a consulta de pendências do usuário na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPendingIssues'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UserPendingIssues'
+                
+        '404':
+          description: Nenhum dado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+        
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
   /pending-issues/users/{userId}/current-month:
     get:
       tags:
@@ -1301,6 +1345,19 @@ components:
         notificateReset:
           type: boolean
           example: false
+          
+    UserPendingIssues:
+      type: object
+      properties:
+        data:
+          type: array
+          items: 
+            type: object
+            properties:
+              pendingIssueId:
+                type: number
+              pendingIssueDescription:
+                type: string
           
     PendingIssues:
       type: object
