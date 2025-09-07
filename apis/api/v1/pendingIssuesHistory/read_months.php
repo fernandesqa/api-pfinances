@@ -31,31 +31,31 @@
             $monthName = '';
 
             switch($MONTH) {
-                case '01':
+                case '1':
                     $monthName = 'Janeiro';
                     break;
-                case '02':
+                case '2':
                     $monthName = 'Fevereiro';
                     break;
-                case '03':
+                case '3':
                     $monthName = 'Março';
                     break;
-                case '04':
+                case '4':
                     $monthName = 'Abril';
                     break;
-                case '05':
+                case '5':
                     $monthName = 'Maio';
                     break;
-                case '06':
+                case '6':
                     $monthName = 'Junho';
                     break;
-                case '07':
+                case '7':
                     $monthName = 'Julho';
                     break;
-                case '08':
+                case '8':
                     $monthName = 'Agosto';
                     break;
-                case '09':
+                case '9':
                     $monthName = 'Setembro';
                     break;
                 case '10':
