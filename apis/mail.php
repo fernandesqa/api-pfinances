@@ -23,6 +23,7 @@
         public function send_email($subject, $body, $altbody) {
            
             $mail = new PHPMailer(true);
+            $mail->CharSet = 'UTF-8';
 
             try {
                 // Configurações do servidor SMTP
