@@ -16,7 +16,7 @@
     $obPendingIssuesHistory = new PendingIssuesHistory($db);
 
     $data = explode('/', $_SERVER['REQUEST_URI']);
-    $userId = $data[count($data) - 2];
+    $userId = $data[count($data) - 1];
 
     $obPendingIssues->User_ID = $userId;
     $obPendingIssues->Pending_Issues_Month_Year = date('m').date('Y');
