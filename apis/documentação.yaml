@@ -742,7 +742,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalError'
                 
-  /pending-issues/users/{userId}/reset:
+  /reset-pending-issues/{userId}:
     put:
       tags:
         - Pendências
