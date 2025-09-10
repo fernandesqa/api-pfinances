@@ -654,7 +654,7 @@
             }
             break;
 
-        case str_contains($_SERVER['REQUEST_URI'], $prefixApi.'/pending-issues/users') && str_contains($_SERVER['REQUEST_URI'], '/reset'):
+        case str_contains($_SERVER['REQUEST_URI'], '/reset'):
             //VERIFICA O MÉTODO ENVIADO NA REQUEST
             switch($_SERVER['REQUEST_METHOD']) {
                 case 'PUT':
