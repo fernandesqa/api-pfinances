@@ -654,12 +654,12 @@
             }
             break;
 
-        case str_contains($_SERVER['REQUEST_URI'], '/reset'):
+        case str_contains($_SERVER['REQUEST_URI'], $prefixApi.'/reset-pending-issues'):
             //VERIFICA O MÉTODO ENVIADO NA REQUEST
             switch($_SERVER['REQUEST_METHOD']) {
                 case 'PUT':
                     $data = explode('/', $_SERVER['REQUEST_URI']);
-                    $userId = $data[count($data) - 2];
+                    $userId = $data[count($data) - 1];
                     if($userId != 'users' && $userId != '/' && $userId != '') {
                         //VALIDA O ACCESSTOKEN E ENTÃO BUSCA OS CONVITES
                         $all_headers = getallheaders();
