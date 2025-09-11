@@ -8,6 +8,8 @@
         public $Pending_Issues_ID;
         public $User_ID;
         public $Family_ID;
+        public $Person_Name;
+        public $User_Email;
         public $Pending_Issues_Description;
         public $Pending_Issues_Month_Year;
         public $Pending_Issues_Done;
@@ -250,6 +252,7 @@
             return false;
         }
 
+        //Consulta as pendências do usuário
         public function readUserPendingIssues() {
             $query = 'SELECT 
                         Pending_Issues_ID, 
@@ -262,6 +265,76 @@
             $stmt = $this->conn->prepare($query);
 
             //LIGA OS DADOS 
+            $stmt->bindParam(':user_id', $this->User_ID);
+
+            //EXECUTA A QUERY
+            $stmt->execute();
+
+            return $stmt;
+        }
+
+        //Consulta o id de usuários com pendências não concluídas
+        public function readUsersWithPendingIssuesNotDone() {
+            $query = 'SELECT 
+                        DISTINCT(pi.User_ID) as User_ID
+                    FROM 
+                        '.$this->table.' as pi
+                    WHERE pi.Pending_Issues_Month_Year = :month_year 
+                    AND pi.Pending_Issues_Done = 0';
+
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS 
+            $stmt->bindParam(':month_year', $this->Pending_Issues_Month_Year);
+
+            //EXECUTA A QUERY
+            $stmt->execute();
+
+            return $stmt;
+        }
+
+        //Consulta o nome e e-mail do usuário a partir do id
+        public function readNameAndEmail() {
+            $query = 'SELECT 
+                        usr.USER_ID as "User_ID",
+                        p.Person_Name as "Person_Name",
+                        usr.User_Email as "User_Email"
+                    FROM 
+                        User as usr
+                    INNER JOIN 
+                        Person as p
+                    ON p.Person_ID = usr.Person_ID
+                    WHERE usr.User_ID = :user_id';
+
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS 
+            $stmt->bindParam(':user_id', $this->User_ID);
+
+            //EXECUTA A QUERY
+            $stmt->execute();
+
+            return $stmt;
+        }
+
+        //Consulta a lista de pendências não concluída do usuário
+        public function readPendingIssuesList() {
+            $query = 'SELECT 
+                        pi.User_ID as "User_ID",
+                        pi.Pending_Issues_Description as "Pending_Issues_Description"
+                    FROM 
+                        Pending_Issues as pi
+                    WHERE pi.Pending_Issues_Month_Year = :month_year 
+                    AND pi.Pending_Issues_Done = 0
+                    AND pi.User_ID = :user_id';
+
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS 
+            $stmt->bindParam(':month_year', $this->Pending_Issues_Month_Year);
             $stmt->bindParam(':user_id', $this->User_ID);
 
             //EXECUTA A QUERY
