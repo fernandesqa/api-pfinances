@@ -2,6 +2,7 @@
 
     include_once __DIR__.'/Database.php';
     include_once __DIR__.'/security.php';
+    include_once __DIR__.'/mail.php';
     include_once __DIR__.'/models/Invites.php'; 
     include_once __DIR__.'/models/Person.php';
     include_once __DIR__.'/models/Family.php';
@@ -960,6 +961,32 @@
                         http_response_code(401);
                         echo json_encode('userId and familyId are required');
                     }
+                    break;
+
+                default:
+                    http_response_code(403);
+                    echo json_encode('Method not supported');
+            }
+            break;
+
+        case str_contains($_SERVER['REQUEST_URI'], $prefixApi.'/pending-issues/send-email'):
+            //VERIFICA O MÉTODO ENVIADO NA REQUEST
+            switch($_SERVER['REQUEST_METHOD']) {
+                case 'POST':
+                    $all_headers = getallheaders();
+                        $authorizationHeaderInformed = $generalFunctions->xApiKeyHeaderInformed($all_headers);
+                        if($authorizationHeaderInformed) {
+                            $accessToken = $generalFunctions->getAccessToken($all_headers);
+                            if($accessToken==$_ENV['EMAIL_SECRET_KEY']) {
+                                require __DIR__ .'/api/v1/pendingIssues/send_email_pending_issues.php';
+                            } else {
+                                http_response_code(401);
+                                echo json_encode('Invalid token'); 
+                            }
+                        }else {
+                            http_response_code(400);
+                            echo json_encode('x-api-key header is required');
+                        }
                     break;
 
                 default:
