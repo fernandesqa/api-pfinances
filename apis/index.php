@@ -2,6 +2,7 @@
 
     include_once __DIR__.'/Database.php';
     include_once __DIR__.'/security.php';
+    include_once __DIR__.'/mail.php';
     include_once __DIR__.'/models/Invites.php'; 
     include_once __DIR__.'/models/Person.php';
     include_once __DIR__.'/models/Family.php';
@@ -960,6 +961,19 @@
                         http_response_code(401);
                         echo json_encode('userId and familyId are required');
                     }
+                    break;
+
+                default:
+                    http_response_code(403);
+                    echo json_encode('Method not supported');
+            }
+            break;
+
+        case str_contains($_SERVER['REQUEST_URI'], $prefixApi.'/send-email'):
+            //VERIFICA O MÉTODO ENVIADO NA REQUEST
+            switch($_SERVER['REQUEST_METHOD']) {
+                case 'POST':
+                    require __DIR__ .'/api/v1/pendingIssues/send_email_pending_issues.php';
                     break;
 
                 default:

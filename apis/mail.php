@@ -46,9 +46,9 @@
                 $mail->AltBody = $altbody; // Para clientes sem suporte a HTML
 
                 $mail->send();
-                echo 'Mensagem enviada com sucesso';
+                return 'Mensagem enviada com sucesso';
             } catch (Exception $e) {
-                echo "Mensagem não pôde ser enviada. Erro: {$mail->ErrorInfo}";
+                return "Mensagem não pôde ser enviada. Erro: {$mail->ErrorInfo}";
             }
         }
 
