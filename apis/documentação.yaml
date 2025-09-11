@@ -17,6 +17,7 @@ tags:
   - name: Usuários
   - name: Pendências
   - name: Receitas
+  - name: Envio de E-mails
 paths:
   /invite:
     post:
@@ -1110,6 +1111,33 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/InternalError'
+                
+  /pending-issues/send-email:
+    post:
+      tags:
+        - Envio de E-mails
+      summary: Envia e-mail com a relação de pendências em aberto
+      description: Realiza o envio de e-mail aos usuários que possuem pendências não concluídas
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailPendingIssues'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/SendEmailPendingIssues'
+      
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
           
     
 components:
@@ -1532,3 +1560,10 @@ components:
               value:
                 type: integer
                 example: 5600.50
+                
+    SendEmailPendingIssues:
+      type: object
+      properties:
+        message:
+          type: string
+          example: E-mail enviado com sucesso
