@@ -973,20 +973,7 @@
             //VERIFICA O MÉTODO ENVIADO NA REQUEST
             switch($_SERVER['REQUEST_METHOD']) {
                 case 'POST':
-                    $all_headers = getallheaders();
-                        $authorizationHeaderInformed = $generalFunctions->xApiKeyHeaderInformed($all_headers);
-                        if($authorizationHeaderInformed) {
-                            $accessToken = $generalFunctions->getAccessToken($all_headers);
-                            if($accessToken==$_ENV['EMAIL_SECRET_KEY']) {
-                                require __DIR__ .'/api/v1/pendingIssues/send_email_pending_issues.php';
-                            } else {
-                                http_response_code(401);
-                                echo json_encode('Invalid token'); 
-                            }
-                        }else {
-                            http_response_code(400);
-                            echo json_encode('x-api-key header is required');
-                        }
+                    require __DIR__ .'/api/v1/pendingIssues/send_email_pending_issues.php';
                     break;
 
                 default:
