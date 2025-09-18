@@ -65,14 +65,13 @@
                         Revenue_Description 
                     FROM '.$this->table.' 
                     WHERE Family_ID = :family_id 
-                    AND Revenue_Month_Year = :month_year';
+                    AND Revenue_Month_Year LIKE "%'.$this->Revenue_Month_Year.'"';
 
             //PREPARA A QUERY
             $stmt = $this->conn->prepare($query);
 
             //LIGA OS DADOS 
             $stmt->bindParam(':family_id', $this->Family_ID);
-            $stmt->bindParam(':month_year', $this->Revenue_Month_Year);
 
             //EXECUTA A QUERY
             $stmt->execute();
