@@ -22,7 +22,6 @@
 
     $obRevenue->Family_ID = $familyId;
     $obRevenue->Revenue_Month_Year = $monthYear;
-
     $result = $obRevenue->read();
 
     $num = $result->rowCount();
