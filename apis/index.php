@@ -62,7 +62,7 @@
             switch ($_SERVER['REQUEST_METHOD']) {
                 case 'POST' :
                     $data = json_decode(file_get_contents("php://input"));
-                    if($data->userId && $data->familyId && $data->emailAddress) {
+                    if($data->userId && $data->familyId && $data->name && $data->emailAddress) {
                         //VALIDA O ACCESSTOKEN E ENTÃO PROCURA PELO USUÁRIO INFORMADO
                         $all_headers = getallheaders();
                         $authorizationHeaderInformed = $generalFunctions->xApiKeyHeaderInformed($all_headers);
@@ -83,7 +83,7 @@
                     } else {
                         http_response_code(400);
                         echo json_encode(
-                            array('message' => 'É obrigatório informar os campos familyId e emailAddress'), JSON_UNESCAPED_UNICODE
+                            array('message' => 'É obrigatório informar os campos userId, familyId, name e emailAddress'), JSON_UNESCAPED_UNICODE
                         );
                     } 
                     break;

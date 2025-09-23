@@ -1173,6 +1173,8 @@ components:
           type: number
         familyId:
           type: number
+        name:
+          type: string
         emailAddress:
           type: string
           

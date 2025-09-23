@@ -36,6 +36,26 @@
             return $stmt;
         }
 
+        // CONSULTA O NOME DA PESSOA
+        public function readPersonName() {
+            $query = 'SELECT 
+                    Person_Name
+                FROM 
+                    '.$this->table. '
+                WHERE Person_ID = :person_id';
+            
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS 
+            $stmt->bindParam(':person_id', $this->Person_ID);
+
+            //EXECUTA A QUERY
+            $stmt->execute();
+
+            return $stmt;
+        }
+
         // CADASTRA UMA NOVA PESSOA
         public function create() {
             $query = 'INSERT INTO '.$this->table. '
