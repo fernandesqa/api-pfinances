@@ -191,9 +191,10 @@
                     <p>Seguem abaixo os seus dados e instruções para realizar o primeiro acesso no sistema:</p><br>
                     <p><b>E-mail de login:</b> '.$data->emailAddress.'</p>
                     <p><b>Código do Convite:</b> '.$inviteCode.'</p>
-                    <p><b>Página do Primeiro Acesso:</b> <a href="https://pfinances.com.br/app/primeiro-acesso">https://pfinances.com.br/app/primeiro-acesso</a></p>
+                    <p><b>Página de login do portal:</b> <a href="https://pfinances.com.br/app/login">https://pfinances.com.br/app/login</a></p>
                     <br><b>Siga os seguintes passos:</b><br>
-                    <ol><li>Acesse a página do primeiro acesso</li>
+                    <ol><li>Acesse a página de login</li>
+                    <li>Acesse a página de primeiro acesso pelo botão <b>Primeiro Acesso</b></li>
                     <li>Selecione a opção: <b>Recebi o convite de um familiar</b></li>
                     <li>Informe o código do convite informado acima</li>
                     <li>Informe o e-mail de login informado acima</li>
@@ -207,13 +208,14 @@
                     Seguem abaixo os seus dados e instruções para realizar o primeiro acesso no sistema:
                     E-mail de login: '.$data->emailAddress.'
                     Código do Convite: '.$inviteCode.'
-                    Página do Primeiro Acesso: https://pfinances.com.br/app/primeiro-acesso
+                    Página do Primeiro Acesso: https://pfinances.com.br/app/login
                     Siga os seguintes passos:
-                    1. Acesse a página do primeiro acesso
-                    2. Selecione a opção: Recebi o convite de um familiar
-                    3. Informe o código do convite informado acima
-                    4. Informe o e-mail de login informado acima
-                    5. Valide o convite e conclua o cadastro
+                    1. Acesse a página de login
+                    2. Acesse a página de primeiro acesso pelo botão Primeiro Acesso
+                    3. Selecione a opção: Recebi o convite de um familiar
+                    4. Informe o código do convite informado acima
+                    5. Informe o e-mail de login informado acima
+                    6. Valide o convite e conclua o cadastro
                     Seja muito bem vindo(a)!
                     Atenciosamente,
                     Equipe Pfinances';
