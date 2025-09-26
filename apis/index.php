@@ -177,6 +177,74 @@
             }
 
             break;
+        
+        case str_contains($_SERVER['REQUEST_URI'], $prefixApi.'/reset-requested'):
+            switch($_SERVER['REQUEST_METHOD']) {
+                CASE 'GET':
+                    $data = explode('/', $_SERVER['REQUEST_URI']);
+                    $emailAddress = $data[count($data) - 1];
+
+                    if($emailAddress!='reset-requested/' && $emailAddress!='reset-requested' && $emailAddress!='') {
+                        $all_headers = getallheaders();
+                        $authorizationHeaderInformed = $generalFunctions->xApiKeyHeaderInformed($all_headers);
+                        if($authorizationHeaderInformed) {
+                            $accessToken = $generalFunctions->getAccessToken($all_headers);
+                            if($accessToken==$_ENV['API_SECRET_KEY']) {
+                                require __DIR__ .'/api/v1/users/check_reset_requested.php';    
+                            } else {
+                                http_response_code(401);
+                                echo json_encode('Invalid token'); 
+                            }
+                            
+                        } else {
+                            http_response_code(400);
+                            echo json_encode('x-api-key header is required');
+                        }
+                        
+                    } else {
+                        http_response_code(401);
+                        echo json_encode('email address is required');
+                    }
+                    break;
+                default:
+                    http_response_code(403);
+                    echo json_encode('Method not supported');
+                    
+            }
+            break;
+        
+        case str_contains($_SERVER['REQUEST_URI'], $prefixApi.'/request-reset'):
+            switch($_SERVER['REQUEST_METHOD']) {
+                CASE 'POST':
+                    $data = json_decode(file_get_contents("php://input"));
+                    if($data->emailAddress) {
+                        $all_headers = getallheaders();
+                        $authorizationHeaderInformed = $generalFunctions->xApiKeyHeaderInformed($all_headers);
+                        if($authorizationHeaderInformed) {
+                            $accessToken = $generalFunctions->getAccessToken($all_headers);
+                            if($accessToken==$_ENV['API_SECRET_KEY']) {
+                                require __DIR__ .'/api/v1/users/request_reset.php';    
+                            } else {
+                                http_response_code(401);
+                                echo json_encode('Invalid token'); 
+                            }
+                            
+                        } else {
+                            http_response_code(400);
+                            echo json_encode('x-api-key header is required');
+                        }
+                        
+                    } else {
+                        http_response_code(401);
+                        echo json_encode('emailAddress is required');
+                    }
+                    break;
+                default:
+                    http_response_code(403);
+                    echo json_encode('Method not supported');
+                    
+            }
+            break;
 
         case str_contains($_SERVER['REQUEST_URI'], $prefixApi.'/family-invites/users/'):
             //VERIFICA O MÉTODO ENVIADO NA REQUEST

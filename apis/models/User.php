@@ -14,6 +14,7 @@
         public $User_Email;
         public $User_Password;
         public $User_First_Access;
+        public $User_Reset_Requested;
 
         // CONSTRUTOR COM BANCO DE DADOS
         public function __construct($db) {
@@ -131,7 +132,8 @@
                     Role_ID,
                     Person.Person_Name, 
                     User.User_Password,
-                    User.User_First_Access
+                    User.User_First_Access,
+                    User.User_Reset_Requested
                 FROM '.$this->table.' 
                 INNER JOIN Person 
                 ON User.Person_ID = Person.Person_ID 
@@ -292,6 +294,105 @@
 
             //LIGA OS DADOS 
             $stmt->bindParam(':user_id', $this->User_ID);
+
+            //EXECUTA A QUERY
+            $stmt->execute();
+
+            return $stmt;
+        }
+
+        public function getResetRequested() {
+            $query = 'SELECT 
+                        User_Reset_Requested
+                    FROM '.$this->table.'
+                    WHERE User_Email = :user_email';
+            
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS 
+            $stmt->bindParam(':user_email', $this->User_Email);
+
+            //EXECUTA A QUERY
+            $stmt->execute();
+
+            return $stmt;
+        }
+
+        public function requestReset() {
+            $query = 'UPDATE '.$this->table.'
+                    SET User_Reset_Requested = 1
+                    WHERE User_Email = :user_email';
+            
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS 
+            $stmt->bindParam(':user_email', $this->User_Email);
+            
+            //EXECUTA A QUERY
+             if($stmt->execute()) {
+                return true;
+            }
+            //EXIBE ERRO SE ALGO DER ERRADO
+            printf("Error: %s.\n", $stmt->error);
+            return false;
+        }
+
+        public function cancelResetRequest() {
+            $query = 'UPDATE '.$this->table.'
+                    SET User_Reset_Requested = 0
+                    WHERE User_Email = :user_email';
+            
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS 
+            $stmt->bindParam(':user_email', $this->User_Email);
+            
+            //EXECUTA A QUERY
+             if($stmt->execute()) {
+                return true;
+            }
+            //EXIBE ERRO SE ALGO DER ERRADO
+            printf("Error: %s.\n", $stmt->error);
+            return false;
+        }
+
+        public function changePassword() {
+            $query = 'UPDATE '.$this->table.'
+                    SET User_Password = :user_password
+                    WHERE User_Email = :user_email';
+            
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS 
+            $stmt->bindParam(':user_password', $this->User_Password);
+            $stmt->bindParam(':user_email', $this->User_Email);
+            
+            //EXECUTA A QUERY
+             if($stmt->execute()) {
+                return true;
+            }
+            //EXIBE ERRO SE ALGO DER ERRADO
+            printf("Error: %s.\n", $stmt->error);
+            return false;
+        }
+
+        public function getPersonNameByEmail() {
+            $query='SELECT 
+                        Person.Person_Name as Person_Name
+                    FROM '.$this->table.'
+                    INNER JOIN Person 
+                    ON User.Person_ID = Person.Person_ID
+                    WHERE User.User_Email = :user_email';
+            
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS 
+            $stmt->bindParam(':user_email', $this->User_Email);
 
             //EXECUTA A QUERY
             $stmt->execute();
