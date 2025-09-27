@@ -41,10 +41,14 @@
         $name = $row['Person_Name'];
         $password2 = $row['User_Password'];
         $first_access = $row['User_First_Access'];
+        $reset_requested = $row['User_Reset_Requested'];
 
         if($obUsers->User_Password == $password2) {
             switch ($status_id) {
                 case '1':
+                    if($reset_requested=='1') {
+                        $obUsers->cancelResetRequest();
+                    }
                     $secret_key = $security->get_secret_key();
                     $issuer_claim = $security->get_issuer_claim(); // this can be the servername
                     $audience_claim = $security->get_audience_claim();
