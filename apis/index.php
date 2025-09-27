@@ -246,6 +246,39 @@
             }
             break;
 
+        case str_contains($_SERVER['REQUEST_URI'], $prefixApi.'/change-password'):
+            switch($_SERVER['REQUEST_METHOD']) {
+                CASE 'PATCH':
+                    $data = json_decode(file_get_contents("php://input"));
+                    if($data->emailAddress && $data->password) {
+                        $all_headers = getallheaders();
+                        $authorizationHeaderInformed = $generalFunctions->xApiKeyHeaderInformed($all_headers);
+                        if($authorizationHeaderInformed) {
+                            $accessToken = $generalFunctions->getAccessToken($all_headers);
+                            if($accessToken==$_ENV['API_SECRET_KEY']) {
+                                require __DIR__ .'/api/v1/users/change_password.php';    
+                            } else {
+                                http_response_code(401);
+                                echo json_encode('Invalid token'); 
+                            }
+                            
+                        } else {
+                            http_response_code(400);
+                            echo json_encode('x-api-key header is required');
+                        }
+                        
+                    } else {
+                        http_response_code(401);
+                        echo json_encode('emailAddress and password are required');
+                    }
+                    break;
+                default:
+                    http_response_code(403);
+                    echo json_encode('Method not supported');
+                    
+            }
+            break;
+
         case str_contains($_SERVER['REQUEST_URI'], $prefixApi.'/family-invites/users/'):
             //VERIFICA O MÉTODO ENVIADO NA REQUEST
             switch($_SERVER['REQUEST_METHOD']) {
