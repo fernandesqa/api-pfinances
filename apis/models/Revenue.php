@@ -98,6 +98,28 @@
 
             return $stmt;
         }
+
+        public function updateRevenueCurrentValue() {
+            $query = 'UPDATE '.$this->table.' 
+                      SET Revenue_Current_Value = :current_value
+                      WHERE Family_ID = :family_id
+                      AND Revenue_Month_Year = :month_year';
+
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS
+            $stmt->bindParam(':family_id', $this->Family_ID);
+            $stmt->bindParam(':month_year', $this->Revenue_Month_Year);
+
+             //EXECUTA A QUERY
+             if($stmt->execute()) {
+                return true;
+            }
+            //EXIBE ERRO SE ALGO DER ERRADO
+            printf("Error: %s.\n", $stmt->error);
+            return false;
+        }
     }
 
 ?>
