@@ -25,7 +25,7 @@
                     )
                      VALUES (
                      :person_id,
-                     :family_id.
+                     :family_id,
                      :description
                      )';
             //PREPARA A QUERY

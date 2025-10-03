@@ -139,6 +139,44 @@
 
             return $stmt;
         }
+
+        public function getRevenueCurrentValue() {
+            $query = 'SELECT 
+                        Revenue_Current_Value
+                      FROM '.$this->table.' 
+                      WHERE Revenue_ID = :revenue_id';
+            
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS 
+            $stmt->bindParam(':revenue_id', $this->Revenue_ID);
+
+            //EXECUTA A QUERY
+            $stmt->execute();
+
+            return $stmt;
+        }
+
+        public function updateCurrentValue() {
+            $query = 'UPDATE 
+                      SET 
+                        Revenue_Current_Value = :current_value 
+                      WHERE 
+                        Revenue_ID = :revenue_id';
+            
+            //LIGA OS DADOS
+            $stmt->bindParam(':current_value', $this->Revenue_Current_Value);
+            $stmt->bindParam(':revenue_id', $this->Revenue_ID);
+
+             //EXECUTA A QUERY
+             if($stmt->execute()) {
+                return true;
+            }
+            //EXIBE ERRO SE ALGO DER ERRADO
+            printf("Error: %s.\n", $stmt->error);
+            return false;
+        }
     }
 
 ?>
