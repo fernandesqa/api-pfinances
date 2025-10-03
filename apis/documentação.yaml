@@ -1213,18 +1213,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalError'
                 
-  /list-revenues/families/{familyId}/periods/{monthYear}:
+  /list-revenues/users/{userId}/families/{familyId}/periods/{monthYear}:
     get:
       tags:
         - Receitas
       summary: Consulta o nome de receitas criadas no mês e ano informado
       description: Realiza a consulta do nome de receitas criadas no mês e ano informado
       parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
         - name: familyId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
         - name: monthYear
           in: path
           required: true
@@ -1286,7 +1291,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalError'
                 
-  /budgets/users/{userId}/periods/{monthYear}/create:
+  /budgets/users/{userId}/families/{familyId}/periods/{monthYear}/create:
     post:
       tags:
         - Orçamentos
@@ -1294,6 +1299,12 @@ paths:
       description: Realiza o cadastro de um novo orçamento na base
       parameters:
         - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: familyId
           in: path
           required: true
           schema:
@@ -1334,18 +1345,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalError'
                 
-  /list-budgets/families/{familyId}:
+  /list-budgets/users/{userId}/families/{familyId}:
     get:
       tags:
         - Orçamentos
       summary: Consulta o nome de orçamentos criados no mês e ano informado
       description: Realiza a consulta do nome de orçamentos criados no mês e ano informado
       parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
         - name: familyId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: Successful operation
@@ -1868,6 +1884,8 @@ components:
               value:
                 type: number
                 example: 5470.80
+              revenueId:
+                type: integer
           
     BudgetCreated:
       type: object

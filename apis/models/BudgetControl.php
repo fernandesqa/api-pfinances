@@ -88,5 +88,27 @@
 
             return $stmt;
         }
+
+      public function getBudgetByName() {
+        $query = 'SELECT 
+                        Budget_Control_Description 
+                      FROM 
+                        '.$this->table.' 
+                      WHERE 
+                        Family_ID = :family_id
+                      AND Budget_Control_Description = :description';
+        
+        //PREPARA A QUERY
+        $stmt = $this->conn->prepare($query);
+
+        //LIGA OS DADOS 
+        $stmt->bindParam(':family_id', $this->Family_ID);
+        $stmt->bindParam(':description', $this->Budget_Control_Description);
+
+        //EXECUTA A QUERY
+        $stmt->execute();
+
+        return $stmt;
+      }
     }
 ?>

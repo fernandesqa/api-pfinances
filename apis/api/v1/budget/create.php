@@ -19,6 +19,10 @@
     //INSTACIA O OBJETO REVENUE
     $obRevenue = new Revenue($db);
 
-    
+    $data = json_decode(file_get_contents("php://input"));
+
+    $totalBudgets = count($data->budgets);
+
+    echo json_encode(count($data->budgets));
 
 ?>
