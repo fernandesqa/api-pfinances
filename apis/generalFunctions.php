@@ -68,5 +68,66 @@
 
             return $accessToken;
         }
+
+        function convertToMonetary($value) {
+
+            $monetaryValue = '';
+
+            echo json_encode(strlen($value));
+
+            if($value==null) {
+                $monetaryValue = 'R$ 0,00';
+            } else {
+                switch(strlen($value)) {
+                    case 4:
+                        if(str_contains($value, '.')) {
+                            $monetaryValue = 'R$ '.str_replace('.', ',', $value).'0';
+                        } else {
+                            $monetaryValue = 'R$ '.substr($value, 0, 1).'.'.substr($value, 1, 4).',00';
+                        }
+                        
+                        break;
+                    case 5:
+                        $monetaryValue = 'R$ '.str_replace('.', ',', $value).'0';
+                        break;
+                    case 6:
+                        $value = str_replace('.', ',', $value);
+                        $monetaryValue = 'R$ '.substr($value, 0, 1).'.'.substr($value, 1, 4).substr($value, 5, 6).'0';
+                        break;
+                    case 7:
+                        $value = str_replace('.', ',', $value);
+                        $checkValue = explode(',', $value);
+                        if(strlen($checkValue[0])==4) {
+                            $monetaryValue = 'R$ '.substr($value, 0, 1).'.'.substr($value, 1, 4).substr($value, 5, 7);
+                        } else {
+                            $monetaryValue = 'R$ '.substr($value, 0, 2).'.'.substr($value, 2, 4).substr($value, 6, 7).'0';
+                        }
+                        
+                        break;
+                    case 8:
+                        if (substr($value, 6, 7)=='.') {
+                            $monetaryValue = 'R$ '.substr($value, 0, 3).'.'.str_replace('.', ',', substr($value, 3, 8)).'0';
+                            break;
+                        } else {
+                            $monetaryValue = 'R$ '.substr($value, 0, 2).'.'.str_replace('.', ',', substr($value, 2, 8));
+                            break;
+                        }
+                    case 9:
+                        if (substr($value, 7, 8)=='.') {
+                            $monetaryValue = 'R$ '.substr($value, 0, 1).'.'.substr($value, 1, 4).'.'.str_replace('.', ',', substr($value, 4, 9)).'0';
+                            break;
+                        } else {
+                            $monetaryValue = 'R$ '.substr($value, 0, 3).'.'.str_replace('.', ',', substr($value, 3, 9));
+                            break;
+                        }
+                    case 10:
+                        $monetaryValue = 'R$ '.substr($value, 0, 1).'.'.substr($value, 1, 4).'.'.str_replace('.', ',', substr($value, 4, 10));
+                        break;
+                }
+                
+            }
+
+            return $monetaryValue;
+        }
     }
 ?>

@@ -19,6 +19,7 @@ tags:
   - name: Receitas
   - name: Envio de E-mails
   - name: Redefinição de Senha
+  - name: Orçamentos
 paths:
   /invite:
     post:
@@ -1212,6 +1213,57 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalError'
                 
+  /list-revenues/users/{userId}/families/{familyId}/periods/{monthYear}:
+    get:
+      tags:
+        - Receitas
+      summary: Consulta o nome de receitas criadas no mês e ano informado
+      description: Realiza a consulta do nome de receitas criadas no mês e ano informado
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: monthYear
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RevenuesList'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/RevenuesList'
+        '404':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
   /pending-issues/send-email:
     post:
       tags:
@@ -1229,6 +1281,106 @@ paths:
               schema:
                 $ref: '#/components/schemas/SendEmailPendingIssues'
       
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /budgets/users/{userId}/families/{familyId}/periods/{monthYear}/create:
+    post:
+      tags:
+        - Orçamentos
+      summary: Cadastra um novo orçamento
+      description: Realiza o cadastro de um novo orçamento na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: monthYear
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Realiza o cadastro de uma nova receita na base
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBudget'
+          application/xml:
+              schema:
+                $ref: '#/components/schemas/CreateBudget'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetCreated'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/BudgetCreated'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /list-budgets/users/{userId}/families/{familyId}:
+    get:
+      tags:
+        - Orçamentos
+      summary: Consulta o nome de orçamentos criados no mês e ano informado
+      description: Realiza a consulta do nome de orçamentos criados no mês e ano informado
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetsList'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/BudgetsList'
+        '404':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
         '500':
           description: Internal Error
           content:
@@ -1663,6 +1815,20 @@ components:
                 type: integer
                 example: 5600.50
                 
+    RevenuesList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              revenueId:
+                type: integer
+                example: 3
+              revenueDescription:
+                type: string
+                
     SendEmailPendingIssues:
       type: object
       properties:
@@ -1704,3 +1870,37 @@ components:
         message:
           type: string
           example: Senha alterada com sucesso
+          
+    CreateBudget:
+      type: object
+      properties:
+        budgets:
+          type: array
+          items:
+            type: object
+            properties:
+              description:
+                type: string
+              value:
+                type: number
+                example: 5470.80
+              revenueId:
+                type: integer
+          
+    BudgetCreated:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Orçamento cadastrado com sucesso
+          
+    BudgetsList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              budgetDescription:
+                type: string

@@ -1,0 +1,59 @@
+<?php
+
+    class Statement {
+        private $conn;
+        private $table = 'Statement';
+
+        // PROPRIEDADES DA TABELA
+        public $Statement_Author;
+        public $Statement_Description;
+        public $Statement_Value;
+        public $Statement_Date;
+        public $Statement_Origin;
+        public $Statement_Destination;
+        public $Family_ID;
+        public $Budget_ID;
+
+        // CONSTRUTOR COM BANCO DE DADOS
+        public function __construct($db) {
+            $this->conn = $db;
+        }
+
+        public function revenueCreation() {
+            $query = 'INSERT INTO '.$this->table.' 
+                      (
+                        Statement_Author,
+                        Statement_Description,
+                        Statement_Value,
+                        Statement_Date,
+                        Family_ID
+                      ) 
+                      VALUES (
+                        :statement_author,
+                        :statement_description,
+                        :statement_value,
+                        :statement_date,
+                        :family_id
+                      )';
+            
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS
+            $stmt->bindParam(':statement_author', $this->Statement_Author);
+            $stmt->bindParam(':statement_description', $this->Statement_Description);
+            $stmt->bindParam(':statement_value', $this->Statement_Value);
+            $stmt->bindParam(':statement_date', $this->Statement_Date);
+            $stmt->bindParam(':family_id', $this->Family_ID);
+            
+            //EXECUTA A QUERY
+            if($stmt->execute()) {
+                return true;
+            }
+            //EXIBE ERRO SE ALGO DER ERRADO
+            printf("Error: %s.\n", $stmt->error);
+            return false;
+        }
+    }
+
+?>
