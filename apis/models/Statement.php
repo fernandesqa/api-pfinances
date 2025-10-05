@@ -54,6 +54,41 @@
             printf("Error: %s.\n", $stmt->error);
             return false;
         }
+
+        public function savingsCreation() {
+            $query = 'INSERT INTO '.$this->table.'
+                      VALUES (
+                        :statement_author,
+                        :statement_description,
+                        :statement_value,
+                        :statement_date,
+                        :statement_origin,
+                        :statement_destination,
+                        :family_id,
+                        :budget_id
+                      )';
+            
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS
+            $stmt->bindParam(':statement_author', $this->Statement_Author);
+            $stmt->bindParam(':statement_description', $this->Statement_Description);
+            $stmt->bindParam(':statement_value', $this->Statement_Value);
+            $stmt->bindParam(':statement_date', $this->Statement_Date);
+            $stmt->bindParam(':statement_origin', $this->Statement_Origin);
+            $stmt->bindParam(':statement_destination', $this->Statement_Destination);
+            $stmt->bindParam(':family_id', $this->Family_ID);
+            $stmt->bindParam(':budget_id', $this->Budget_ID);
+            
+            //EXECUTA A QUERY
+            if($stmt->execute()) {
+                return true;
+            }
+            //EXIBE ERRO SE ALGO DER ERRADO
+            printf("Error: %s.\n", $stmt->error);
+            return false;
+        }
     }
 
 ?>

@@ -20,16 +20,9 @@
 
         public function create() {
             $query = 'INSERT INTO '.$this->table.' 
-                    (
-                        Person_ID,
-                        Family_ID,
-                        Revenue_Month_Year,
-                        Revenue_Value,
-                        Revenue_Current_Value,
-                        Revenue_Description
-                    )
                     VALUES
                     (
+                        :revenue_id,
                         :person_id,
                         :family_id,
                         :revenue_month_year,
@@ -42,6 +35,7 @@
             $stmt = $this->conn->prepare($query);
 
             //LIGA OS DADOS
+            $stmt->bindParam(':revenue_id', $this->Revenue_ID);
             $stmt->bindParam(':person_id', $this->Person_ID);
             $stmt->bindParam(':family_id', $this->Family_ID);
             $stmt->bindParam(':revenue_month_year', $this->Revenue_Month_Year);
@@ -108,6 +102,7 @@
             $stmt = $this->conn->prepare($query);
 
             //LIGA OS DADOS
+            $stmt->bindParam(':current_value', $this->Revenue_Current_Value);
             $stmt->bindParam(':family_id', $this->Family_ID);
             $stmt->bindParam(':month_year', $this->Revenue_Month_Year);
 
@@ -158,24 +153,24 @@
             return $stmt;
         }
 
-        public function updateCurrentValue() {
-            $query = 'UPDATE 
-                      SET 
-                        Revenue_Current_Value = :current_value 
+        public function getRevenueDescription() {
+            $query = 'SELECT 
+                        Revenue_Description 
+                      FROM 
+                        '.$this->table.' 
                       WHERE 
-                        Revenue_ID = :revenue_id';
+                        Revenue_ID = :id';
             
-            //LIGA OS DADOS
-            $stmt->bindParam(':current_value', $this->Revenue_Current_Value);
-            $stmt->bindParam(':revenue_id', $this->Revenue_ID);
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
 
-             //EXECUTA A QUERY
-             if($stmt->execute()) {
-                return true;
-            }
-            //EXIBE ERRO SE ALGO DER ERRADO
-            printf("Error: %s.\n", $stmt->error);
-            return false;
+            //LIGA OS DADOS 
+            $stmt->bindParam(':id', $this->Revenue_ID);
+
+            //EXECUTA A QUERY
+            $stmt->execute();
+
+            return $stmt;
         }
     }
 

@@ -19,6 +19,9 @@
     //INSTACIA O OBJETO REVENUE
     $obRevenue = new Revenue($db);
 
+    //INSTANCIA O OBJETO SAVINGS_CONTROL
+    $obSavingsControl = new SavingsControl($db);
+
     // INSTANCIA O OBJETO STATEMENT
     $obStatement = new Statement($db);
 
@@ -29,20 +32,28 @@
     $obGeneralFunctions = new generalFunctions();
 
     $personId;
+    date_default_timezone_set('America/Sao_Paulo');
     $day = date('d');
     $month = date('m');
     $year = date('Y');
-    $statementDate = (string)$day.'/'.$month.'/'.$year;
+    $statementDate = $day.'/'.$month.'/'.$year;
 
     $obStatement->Statement_Date = $statementDate;
 
     $url = explode('/', $_SERVER['REQUEST_URI']);
     $userId = $url[count($url) - 6];
+    $familyId = $url[count($url) - 4];
     $monthYear = $url[count($url) - 2];
+
+    $obBugetControl->Family_ID = $familyId;
+    $obBudget->Family_ID = $familyId;
+    $obStatement->Family_ID = $familyId;
+    $obRevenue->Family_ID = $familyId;
 
     $data = json_decode(file_get_contents("php://input"));
 
     $obBudget->Budget_Month_Year = $monthYear;
+    $obRevenue->Revenue_Month_Year = $monthYear;
 
     $obUser->User_ID = $userId;
 
@@ -52,11 +63,8 @@
         extract($row);
 
         $obBugetControl->Person_ID = $Person_ID;
-        $obBugetControl->Family_ID = $Family_ID;
         $obBudget->Person_ID = $Person_ID;
-        $obBudget->Family_ID = $Family_ID;
         $personId = $Person_ID;
-        $obStatement->Family_ID = $Family_ID;
     }
 
     $obPerson->Person_ID = $personId;
@@ -72,8 +80,16 @@
     $totalBudgets = count($data->budgets);
 
     for($i=0; $i<$totalBudgets; $i++) {
-        $obBudget->Revenue_ID = $data->budgets[$i]->revenueId;
-        $obRevenue->Revenue_ID = $data->budgets[$i]->revenueId;
+        if($data->budgets[$i]->revenue) {
+            $obBudget->Budget_Origin_ID = $data->budgets[$i]->revenueId;
+            $obRevenue->Revenue_ID = $data->budgets[$i]->revenueId;
+        } else {
+            $obBudget->Budget_Origin_ID = $data->budgets[$i]->savingsId;
+            $obSavingsControl->Savings_Control_ID = $data->budgets[$i]->savingsId;
+        }
+        
+        $obBudget->Budget_Value = $data->budgets[$i]->value;
+        $obBudget->Budget_Current_Value = $data->budgets[$i]->value;
         $obBugetControl->Budget_Control_Description = $data->budgets[$i]->description;
         $obStatement->Statement_Description = 'Destinação de valor para o orçamento "'.$data->budgets[$i]->description.'"';
         $obStatement->Statement_Value = '- '.$obGeneralFunctions->convertToMonetary((string)$data->budgets[$i]->value);
@@ -83,35 +99,27 @@
 
         //VERIFICA SE O ORÇAMENTO INFORMADO JÁ EXISTE NA TABELA DE CONTROLE
         if($num > 0) {
-            //OBTÉM O VALOR ATUAL DO ORÇAMENTO
-            $result = $obRevenue->getRevenueCurrentValue();
-            $currentValue;
-                while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+
+            //OBTÉM O ID DO BUDGET
+            $budgetId;
+            $result = $obBugetControl->getBudgetId();
+
+            while($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 extract($row);
 
-                $currentValue = $Revenue_Current_Value;
+                $budgetId = $Budget_Control_ID;
             }
 
-            $updatedValue = $currentValue - $data->budgets[$i]->value;
+            $obStatement->Budget_ID = $budgetId;
+            $obBudget->Budget_Control_ID = $budgetId;
 
-            $obRevenue->Revenue_Current_Value = $updatedValue; 
+            //OBTÉM O VALOR ATUAL DA RECEITA OU DA ECONOMIA INFORMADA
+            $updatedValue;
 
-            //CONVERTE EM JSON
-            http_response_code(200);
-            echo json_encode($currentValue);
-            echo json_encode($updatedValue);
-
-            //CADASTRA OS DADOS NA TABELA BUDGET
-            
-        } else {
-            //CADASTRA O ORÇAMENTO NA TABELA DE CONTROLE
-            $result = $obBugetControl->createBudget();
-
-            if($result) {
-                //OBTÉM O VALOR ATUAL DO ORÇAMENTO
+            if($data->budgets[$i]->revenue) {
                 $result = $obRevenue->getRevenueCurrentValue();
                 $currentValue;
-                 while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                while($row = $result->fetch(PDO::FETCH_ASSOC)) {
                     extract($row);
 
                     $currentValue = $Revenue_Current_Value;
@@ -119,17 +127,222 @@
 
                 $updatedValue = $currentValue - $data->budgets[$i]->value;
 
-                $obRevenue->Revenue_Current_Value = $updatedValue; 
+                $obRevenue->Revenue_Current_Value = $updatedValue;
+                $obRevenue->Revenue_ID = $data->budgets[$i]->revenueId;
 
-                //CONVERTE EM JSON
-                http_response_code(200);
-                echo json_encode($currentValue);
+                $revenueDescription;
+                $result = $obRevenue->getRevenueDescription();
 
-                //CADASTRA OS DADOS NA TABELA BUDGET
+                while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    extract($row);
+
+                    $revenueDescription = $Revenue_Description;
+                }
+
+                $obStatement->Statement_Origin = $revenueDescription;
 
             } else {
+                $result = $obSavingsControl->getSavingsValue();
+
+                $currentValue;
+                while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    extract($row);
+
+                    $currentValue = $Revenue_Current_Value;
+                }
+
+                $updatedValue = $currentValue - $data->budgets[$i]->value;
+
+                $obSavingsControl->Savings_Control_Value = $updatedValue;
+                $obSavingsControl->Savings_Control_ID = $data->budgets[$i]->savingsId;
+
+                $savingsDescription;
+                $result = $obSavingsControl->getSavingsDescription();
+
+                while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    extract($row);
+
+                    $savingsDescription = $Savings_Control_Description;
+                }
+
+                $obStatement->Statement_Origin = $savingsDescription;
+            }
+             
+            $obStatement->Statement_Destination = $data->budgets[$i]->description;
+
+            //CADASTRA OS DADOS NA TABELA BUDGET
+            $result = $obBudget->setBudgetValue();
+
+            if($result) {
+                //ATUALIZA O VALOR DA RECEITA OU DO REGISTRO DE ECONOMIA
+                if($data->budgets[$i]->revenue) {
+                    $result = $obRevenue->updateRevenueCurrentValue();
+
+                    if($result) {
+                        //REGISTRA OS DADOS NO EXTRATO
+                        $result = $obStatement->savingsCreation();
+
+                        if($result) {
+                            http_response_code(200);
+                            echo json_encode(array('message' => 'Orçamento cadastrado com sucesso'), JSON_UNESCAPED_UNICODE);
+                        } else {
+                            http_response_code(500);
+                            echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                        }
+                    } else {
+                        http_response_code(500);
+                        echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                    }
+                } else {
+                    $result = $obSavingsControl->updateSavingsValue();
+
+                    if($result) {
+                        //REGISTRA OS DADOS NO EXTRATO
+                        $result = $obStatement->savingsCreation();
+
+                        if($result) {
+                            http_response_code(200);
+                            echo json_encode(array('message' => 'Orçamento cadastrado com sucesso'), JSON_UNESCAPED_UNICODE);
+                        } else {
+                            http_response_code(500);
+                            echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                        }
+                    } else {
+                        http_response_code(500);
+                        echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                    }
+                }
+            } else {
                 http_response_code(500);
-                echo json_encode('Erro interno, por favor tente novamente mais tarde');
+                echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+            }
+            
+        } else {
+            //CADASTRA O ORÇAMENTO NA TABELA DE CONTROLE
+            $result = $obBugetControl->createBudget();
+
+            if($result) {
+                //OBTÉM O ID DO BUDGET CRIADO
+                $budgetId;
+                $result = $obBugetControl->getBudgetId();
+
+                while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    extract($row);
+
+                    $budgetId = $Budget_Control_ID;
+                }
+
+                $obStatement->Budget_ID = $budgetId;
+                $obBudget->Budget_Control_ID = $budgetId;
+
+                //OBTÉM O VALOR ATUAL DA RECEITA OU DA ECONOMIA INFORMADA
+                $updatedValue;
+
+                if($data->budgets[$i]->revenue) {
+                    $result = $obRevenue->getRevenueCurrentValue();
+                    $currentValue;
+                    while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                        extract($row);
+
+                        $currentValue = $Revenue_Current_Value;
+                    }
+
+                    $updatedValue = $currentValue - $data->budgets[$i]->value;
+
+                    $obRevenue->Revenue_Current_Value = $updatedValue;
+                    $obRevenue->Revenue_ID = $data->budgets[$i]->revenueId;
+
+                    $revenueDescription;
+                    $result = $obRevenue->getRevenueDescription();
+
+                    while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                        extract($row);
+
+                        $revenueDescription = $Revenue_Description;
+                    }
+
+                    $obStatement->Statement_Origin = $revenueDescription;
+
+                } else {
+
+                    $result = $obSavingsControl->getSavingsValue();
+
+                    $currentValue;
+                    while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                        extract($row);
+
+                        $currentValue = $Revenue_Current_Value;
+                    }
+
+                    $updatedValue = $currentValue - $data->budgets[$i]->value;
+
+                    $obSavingsControl->Savings_Control_Value = $updatedValue;
+                    $obSavingsControl->Savings_Control_ID = $data->budgets[$i]->savingsId;
+
+                    $savingsDescription;
+                    $result = $obSavingsControl->getSavingsDescription();
+
+                    while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                        extract($row);
+
+                        $savingsDescription = $Savings_Control_Description;
+                    }
+
+                    $obStatement->Statement_Origin = $savingsDescription;
+                }
+
+                $obStatement->Statement_Destination = $data->budgets[$i]->description;
+                
+
+                //CADASTRA OS DADOS NA TABELA BUDGET
+                $result = $obBudget->setBudgetValue();
+
+                if($result) {
+                    //ATUALIZA O VALOR DA RECEITA OU DO REGISTRO DE ECONOMIA
+                    if($data->budgets[$i]->revenue) {
+                        $result = $obRevenue->updateRevenueCurrentValue();
+
+                        if($result) {
+                            //REGISTRA OS DADOS NO EXTRATO
+                            $result = $obStatement->savingsCreation();
+
+                            if($result) {
+                                http_response_code(200);
+                                echo json_encode(array('message' => 'Orçamento cadastrado com sucesso'), JSON_UNESCAPED_UNICODE);
+                            } else {
+                                http_response_code(500);
+                                echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                            }
+                        } else {
+                            http_response_code(500);
+                            echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                        }
+                    } else {
+                        $result = $obSavingsControl->updateSavingsValue();
+
+                        if($result) {
+                            //REGISTRA OS DADOS NO EXTRATO
+                            $result = $obStatement->savingsCreation();
+
+                            if($result) {
+                                http_response_code(200);
+                                echo json_encode(array('message' => 'Orçamento cadastrado com sucesso'), JSON_UNESCAPED_UNICODE);
+                            } else {
+                                http_response_code(500);
+                                echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                            }
+                        } else {
+                            http_response_code(500);
+                            echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                        }
+                    }
+                } else {
+                    http_response_code(500);
+                    echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                }
+            } else {
+                http_response_code(500);
+                echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
             }
             
         }

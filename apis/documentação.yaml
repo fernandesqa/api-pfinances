@@ -20,6 +20,8 @@ tags:
   - name: Envio de E-mails
   - name: Redefinição de Senha
   - name: Orçamentos
+  - name: Economias
+  
 paths:
   /invite:
     post:
@@ -1316,7 +1318,7 @@ paths:
           schema:
             type: string
       requestBody:
-        description: Realiza o cadastro de uma nova receita na base
+        description: Realiza o cadastro de um novo orçamento na base
         content:
           application/json:
             schema:
@@ -1381,6 +1383,60 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/DataNotFound'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /savings/users/{userId}/families/{familyId}/periods/{monthYear}/create:
+    post:
+      tags:
+        - Economias
+      summary: Cadastra um novo registro de economia
+      description: Realiza o cadastrado de um novo registro de economia na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: monthYear
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Realiza o cadastro de um novo registro de economia na base
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSavings'
+          application/xml:
+              schema:
+                $ref: '#/components/schemas/CreateSavings'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavingsCreated'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/SavingsCreated'
         '500':
           description: Internal Error
           content:
@@ -1884,8 +1940,18 @@ components:
               value:
                 type: number
                 example: 5470.80
+              revenue:
+                type: boolean
+                example: true
+              savings:
+                type: boolean
+                example: false
               revenueId:
                 type: integer
+                example: 12
+              savingsId:
+                type: integer
+                example: 0
           
     BudgetCreated:
       type: object
@@ -1904,3 +1970,28 @@ components:
             properties:
               budgetDescription:
                 type: string
+                
+    CreateSavings:
+      type: object
+      properties:
+        savings:
+          type: array
+          items:
+            type: object
+            properties:
+              description:
+                type: string
+              value:
+                type: number
+                example: 5470.80
+              budgetId:
+                type: integer
+                example: 3
+          
+    SavingsCreated:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Economia cadastrada com sucesso  
+      
