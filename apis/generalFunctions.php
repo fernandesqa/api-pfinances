@@ -104,7 +104,6 @@
                         
                         break;
                     case 5:
-                        
                         if(substr($value, 2, 1)=='.') {
                             $monetaryValue = 'R$ '.str_replace('.', ',', $value);    
                         } else {

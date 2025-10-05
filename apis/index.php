@@ -1229,6 +1229,109 @@
             }
             break;
 
+        case str_contains($_SERVER['REQUEST_URI'], $prefixApi.'/statement/users'):
+            //VERIFICA O MÉTODO ENVIADO NA REQUEST
+            switch($_SERVER['REQUEST_METHOD']) {
+                case 'GET':
+                    $data = explode('/', $_SERVER['REQUEST_URI']);
+                    $userId = $data[count($data) - 5];
+                    $familyId = $data[count($data) - 3];
+                    $monthYear = $data[count($data) - 1];
+                    if($userId != 'users' && 
+                        $userId != '/' && 
+                        $userId != '' &&
+                        $familyId != 'families' &&
+                        $familyId != '/' &&
+                        $familyId != '' &&
+                        $monthYear != 'periods' &&
+                        $monthYear != '/' &&
+                        $monthYear != '') {
+                            
+                            //VALIDA O ACCESSTOKEN E ENTÃO BUSCA OS CONVITES
+                            $all_headers = getallheaders();
+                            $authorizationHeaderInformed = $generalFunctions->xApiKeyHeaderInformed($all_headers);
+                            if($authorizationHeaderInformed) {
+                                $accessToken = $generalFunctions->getAccessToken($all_headers);
+                                $obAccessToken->User_ID = $userId;
+                                $obAccessToken->Session_Access_Token = $accessToken;
+                                if($obAccessToken->isTokenValid()) {
+                                    //CONSULTA OS DADOS DO EXTRATO
+                                    require __DIR__ .'/api/v1/statement/read.php';
+                                } else {
+                                    http_response_code(401);
+                                    echo json_encode('Invalid token');    
+                                }
+                            } else {
+                                http_response_code(400);
+                                echo json_encode('x-api-key header is required');
+                            }
+
+                        } else {
+                            http_response_code(401);
+                            echo json_encode('userId, familyId and period are required');
+                        }
+                    break;
+                default:
+                    http_response_code(403);
+                    echo json_encode('Method not supported');
+            }
+            break;
+
+        case str_contains($_SERVER['REQUEST_URI'], $prefixApi.'/statement-details/users'):
+            //VERIFICA O MÉTODO ENVIADO NA REQUEST
+            switch($_SERVER['REQUEST_METHOD']) {
+                case 'GET':
+                    $data = explode('/', $_SERVER['REQUEST_URI']);
+                    $userId = $data[count($data) - 7];
+                    $familyId = $data[count($data) - 5];
+                    $monthYear = $data[count($data) - 3];
+                    $budgetId = $data[count($data) - 1];
+                    if($userId != 'users' && 
+                        $userId != '/' && 
+                        $userId != '' &&
+                        $userId != 'budgets' &&
+                        $familyId != 'families' &&
+                        $familyId != '/' &&
+                        $familyId != '' &&
+                        $familyId != 'budgets' &&
+                        $monthYear != 'periods' &&
+                        $monthYear != '/' &&
+                        $monthYear != '' &&
+                        $monthYear != 'budgets' &&
+                        $budgetId != '/' &&
+                        $budgetId != '' &&
+                        $budgetId != 'budgets') {
+                            
+                            //VALIDA O ACCESSTOKEN E ENTÃO BUSCA OS CONVITES
+                            $all_headers = getallheaders();
+                            $authorizationHeaderInformed = $generalFunctions->xApiKeyHeaderInformed($all_headers);
+                            if($authorizationHeaderInformed) {
+                                $accessToken = $generalFunctions->getAccessToken($all_headers);
+                                $obAccessToken->User_ID = $userId;
+                                $obAccessToken->Session_Access_Token = $accessToken;
+                                if($obAccessToken->isTokenValid()) {
+                                    //CONSULTA OS DADOS DO EXTRATO
+                                    require __DIR__ .'/api/v1/statement/read_details.php';
+                                } else {
+                                    http_response_code(401);
+                                    echo json_encode('Invalid token');    
+                                }
+                            } else {
+                                http_response_code(400);
+                                echo json_encode('x-api-key header is required');
+                            }
+
+                        } else {
+                            http_response_code(401);
+                            echo json_encode('userId, familyId, period and budgetId are required');
+                        }
+                    break;
+                default:
+                    http_response_code(403);
+                    echo json_encode('Method not supported');
+            }   
+            break;
+
         case str_contains($_SERVER['REQUEST_URI'], $prefixApi.'/pending-issues/send-email'):
             //VERIFICA O MÉTODO ENVIADO NA REQUEST
             switch($_SERVER['REQUEST_METHOD']) {

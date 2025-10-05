@@ -89,6 +89,33 @@
             printf("Error: %s.\n", $stmt->error);
             return false;
         }
+
+        public function getStatementByPeriod() {
+            $query = 'SELECT 
+                        Statement_Author,
+                        Statement_Description,
+                        Statement_Value,
+                        Statement_Date,
+                        Statement_Origin,
+                        Statement_Destination,
+                        Budget_ID 
+                    FROM '.$this->table.' 
+                    WHERE 
+                        Family_ID = :family_id 
+                    AND 
+                        Statement_Date LIKE "%'.$this->Statement_Date.'"';
+
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS 
+            $stmt->bindParam(':family_id', $this->Family_ID);
+
+            //EXECUTA A QUERY
+            $stmt->execute();
+
+            return $stmt;
+        }
     }
 
 ?>
