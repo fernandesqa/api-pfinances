@@ -20,16 +20,9 @@
 
         public function create() {
             $query = 'INSERT INTO '.$this->table.' 
-                    (
-                        Person_ID,
-                        Family_ID,
-                        Revenue_Month_Year,
-                        Revenue_Value,
-                        Revenue_Current_Value,
-                        Revenue_Description
-                    )
                     VALUES
                     (
+                        :revenue_id,
                         :person_id,
                         :family_id,
                         :revenue_month_year,
@@ -42,6 +35,7 @@
             $stmt = $this->conn->prepare($query);
 
             //LIGA OS DADOS
+            $stmt->bindParam(':revenue_id', $this->Revenue_ID);
             $stmt->bindParam(':person_id', $this->Person_ID);
             $stmt->bindParam(':family_id', $this->Family_ID);
             $stmt->bindParam(':revenue_month_year', $this->Revenue_Month_Year);
@@ -108,6 +102,7 @@
             $stmt = $this->conn->prepare($query);
 
             //LIGA OS DADOS
+            $stmt->bindParam(':current_value', $this->Revenue_Current_Value);
             $stmt->bindParam(':family_id', $this->Family_ID);
             $stmt->bindParam(':month_year', $this->Revenue_Month_Year);
 
@@ -133,6 +128,44 @@
 
             //LIGA OS DADOS 
             $stmt->bindParam(':family_id', $this->Family_ID);
+
+            //EXECUTA A QUERY
+            $stmt->execute();
+
+            return $stmt;
+        }
+
+        public function getRevenueCurrentValue() {
+            $query = 'SELECT 
+                        Revenue_Current_Value
+                      FROM '.$this->table.' 
+                      WHERE Revenue_ID = :revenue_id';
+            
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS 
+            $stmt->bindParam(':revenue_id', $this->Revenue_ID);
+
+            //EXECUTA A QUERY
+            $stmt->execute();
+
+            return $stmt;
+        }
+
+        public function getRevenueDescription() {
+            $query = 'SELECT 
+                        Revenue_Description 
+                      FROM 
+                        '.$this->table.' 
+                      WHERE 
+                        Revenue_ID = :id';
+            
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS 
+            $stmt->bindParam(':id', $this->Revenue_ID);
 
             //EXECUTA A QUERY
             $stmt->execute();

@@ -20,6 +20,9 @@ tags:
   - name: Envio de E-mails
   - name: Redefinição de Senha
   - name: Orçamentos
+  - name: Economias
+  - name: Extrato
+  
 paths:
   /invite:
     post:
@@ -1316,7 +1319,7 @@ paths:
           schema:
             type: string
       requestBody:
-        description: Realiza o cadastro de uma nova receita na base
+        description: Realiza o cadastro de um novo orçamento na base
         content:
           application/json:
             schema:
@@ -1390,7 +1393,167 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/InternalError'
-          
+                
+  /savings/users/{userId}/families/{familyId}/periods/{monthYear}/create:
+    post:
+      tags:
+        - Economias
+      summary: Cadastra um novo registro de economia
+      description: Realiza o cadastrado de um novo registro de economia na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: monthYear
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Realiza o cadastro de um novo registro de economia na base
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSavings'
+          application/xml:
+              schema:
+                $ref: '#/components/schemas/CreateSavings'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavingsCreated'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/SavingsCreated'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /statement/users/{userId}/families/{familyId}/periods/{monthYear}:
+    get:
+      tags:
+        - Extrato
+      summary: Consulta o extrato de determinado período
+      description: Realiza a consulta do extrato de um determimado período na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: monthYear
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statement'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Statement'
+        '404':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError' 
+                
+  /statement-details/users/{userId}/families/{familyId}/periods/{monthYear}/budgets/{budgetId}:
+    get:
+      tags:
+        - Extrato
+      summary: Consulta o detalhamento do extrato de determinado período
+      description: Realiza a consulta do detalhamento do extrato de um determimado período na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: monthYear
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: budgetId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/StatementDetails'
+        '404':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError' 
     
 components:
   schemas:
@@ -1884,8 +2047,18 @@ components:
               value:
                 type: number
                 example: 5470.80
+              revenue:
+                type: boolean
+                example: true
+              savings:
+                type: boolean
+                example: false
               revenueId:
                 type: integer
+                example: 12
+              savingsId:
+                type: integer
+                example: 0
           
     BudgetCreated:
       type: object
@@ -1904,3 +2077,72 @@ components:
             properties:
               budgetDescription:
                 type: string
+                
+    CreateSavings:
+      type: object
+      properties:
+        savings:
+          type: array
+          items:
+            type: object
+            properties:
+              description:
+                type: string
+              value:
+                type: number
+                example: 5470.80
+              budgetId:
+                type: integer
+                example: 3
+          
+    SavingsCreated:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Economia cadastrada com sucesso  
+      
+    Statement:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              author:
+                type: string
+              description:
+                type: string
+              value:
+                type: number
+                example: 125.50
+              date:
+                type: string
+              origin:
+                type: string
+              destination:
+                type: string
+              budgetId:
+                type: integer
+                example: 4
+                
+                
+    StatementDetails:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              author:
+                type: string
+              description:
+                type: string
+              value:
+                type: number
+                example: 125.50
+              date:
+                type: string
+              
