@@ -118,7 +118,8 @@
         public function readRevenuesByPeriod() {
             $query = 'SELECT
                         Revenue_ID,
-                        Revenue_Description
+                        Revenue_Description,
+                        Revenue_Current_Value
                      FROM '.$this->table.'
                      WHERE Family_ID = :family_id 
                      AND Revenue_Month_Year LIKE "%'.$this->Revenue_Month_Year.'"';

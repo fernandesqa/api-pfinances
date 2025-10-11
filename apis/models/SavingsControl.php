@@ -72,7 +72,8 @@
         public function getSavings() {
             $query = 'SELECT 
                         Savings_Control_ID,
-                        Savings_Control_Description 
+                        Savings_Control_Description,
+                        Savings_Control_Value
                       FROM 
                         '.$this->table.' 
                       WHERE 
@@ -82,7 +83,6 @@
             $stmt = $this->conn->prepare($query);
 
             //LIGA OS DADOS 
-            $stmt->bindParam(':description', $this->Savings_Control_Description);
             $stmt->bindParam(':family_id', $this->Family_ID);
 
             //EXECUTA A QUERY
