@@ -29,7 +29,7 @@
             extract($row);
 
             $arr_revenues_item = array(
-                'revenueId' => $Revenue_ID,
+                'revenueId' => intval($Revenue_ID),
                 'revenueDescription' => $Revenue_Description,
                 'currentValue' => floatval($Revenue_Current_Value)
             );
