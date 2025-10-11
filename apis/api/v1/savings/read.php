@@ -27,7 +27,7 @@
             extract($row);
 
             $arr_savings_item = array(
-                'savingsId' => $Savings_Control_ID,
+                'savingsId' => intval($Savings_Control_ID),
                 'savingsDescription' => $Savings_Control_Description,
                 'currentValue' => floatval($Savings_Control_Value)
             );
