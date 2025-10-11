@@ -30,7 +30,8 @@
 
             $arr_revenues_item = array(
                 'revenueId' => $Revenue_ID,
-                'revenueDescription' => $Revenue_Description
+                'revenueDescription' => $Revenue_Description,
+                'currentValue' => floatval($Revenue_Current_Value)
             );
     
             array_push($arr_revenues['data'], $arr_revenues_item);
