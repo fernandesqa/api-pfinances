@@ -1348,7 +1348,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalError'
                 
-  /list-budgets/users/{userId}/families/{familyId}:
+  /list-budgets/users/{userId}/families/{familyId}/periods/{monthYear}:
     get:
       tags:
         - Orçamentos
@@ -1365,6 +1365,11 @@ paths:
           required: true
           schema:
             type: integer
+        - name: monthYear
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Successful operation
@@ -1375,6 +1380,107 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/BudgetsList'
+        '404':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /list-budgets-already-set-on-period/users/{userId}/families/{familyId}/periods/{monthYear}:
+    get:
+      tags:
+        - Orçamentos
+      summary: Consulta os orçamentos definidos no mês e ano informados
+      description: Realiza a consulta dos orçamentos definidos no mês e ano informados na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: monthYear
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetsList'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/BudgetsList'
+        '404':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /list-previous-budgets/users/{userId}/families/{familyId}:
+    get:
+      tags:
+        - Orçamentos
+      summary: Consulta os orçamentos e valores definidos no mês anterior do ano atual
+      description: Realiza a consulta dos orçamentos e valores definidos no mês anterior do ano atual na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviousBudgets'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/PreviousBudgets'
         '404':
           description: Successful operation
           content:
@@ -2124,8 +2230,28 @@ components:
           items:
             type: object
             properties:
+              budgetId:
+                type: integer
+                example: 4
               budgetDescription:
                 type: string
+              budgetCurrentValue:
+                type: number
+                example: 2865
+                
+    PreviousBudgets:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              budgetDescription:
+                type: string
+              budgetValue:
+                type: number
+                example: 2540
                 
     CreateSavings:
       type: object
@@ -2135,6 +2261,9 @@ components:
           items:
             type: object
             properties:
+              date:
+                type: string
+                example: "15/10/2025"
               description:
                 type: string
               value:

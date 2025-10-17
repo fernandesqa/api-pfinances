@@ -79,6 +79,8 @@
 
     $totalBudgets = count($data->budgets);
 
+    $finalResult = false;
+
     for($i=0; $i<$totalBudgets; $i++) {
         if($data->budgets[$i]->revenue) {
             $obBudget->Budget_Origin_ID = $data->budgets[$i]->revenueId;
@@ -126,10 +128,8 @@
                 }
 
                 $updatedValue = $currentValue - $data->budgets[$i]->value;
-
                 $obRevenue->Revenue_Current_Value = $updatedValue;
                 $obRevenue->Revenue_ID = $data->budgets[$i]->revenueId;
-
                 $revenueDescription;
                 $result = $obRevenue->getRevenueDescription();
 
@@ -148,7 +148,7 @@
                 while($row = $result->fetch(PDO::FETCH_ASSOC)) {
                     extract($row);
 
-                    $currentValue = $Revenue_Current_Value;
+                    $currentValue = $Savings_Control_Value;
                 }
 
                 $updatedValue = $currentValue - $data->budgets[$i]->value;
@@ -167,7 +167,7 @@
 
                 $obStatement->Statement_Origin = $savingsDescription;
             }
-             
+                
             $obStatement->Statement_Destination = $data->budgets[$i]->description;
 
             //CADASTRA OS DADOS NA TABELA BUDGET
@@ -183,15 +183,12 @@
                         $result = $obStatement->savingsCreation();
 
                         if($result) {
-                            http_response_code(200);
-                            echo json_encode(array('message' => 'Orçamento cadastrado com sucesso'), JSON_UNESCAPED_UNICODE);
+                            $finalResult = true;
                         } else {
-                            http_response_code(500);
-                            echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                            $finalResult = false;
                         }
                     } else {
-                        http_response_code(500);
-                        echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                        $finalResult = false;
                     }
                 } else {
                     $result = $obSavingsControl->updateSavingsValue();
@@ -201,20 +198,16 @@
                         $result = $obStatement->savingsCreation();
 
                         if($result) {
-                            http_response_code(200);
-                            echo json_encode(array('message' => 'Orçamento cadastrado com sucesso'), JSON_UNESCAPED_UNICODE);
+                            $finalResult = true;
                         } else {
-                            http_response_code(500);
-                            echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                            $finalResult = false;
                         }
                     } else {
-                        http_response_code(500);
-                        echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                        $finalResult = false;
                     }
                 }
             } else {
-                http_response_code(500);
-                echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                $finalResult = false;
             }
             
         } else {
@@ -248,10 +241,8 @@
                     }
 
                     $updatedValue = $currentValue - $data->budgets[$i]->value;
-
                     $obRevenue->Revenue_Current_Value = $updatedValue;
                     $obRevenue->Revenue_ID = $data->budgets[$i]->revenueId;
-
                     $revenueDescription;
                     $result = $obRevenue->getRevenueDescription();
 
@@ -271,7 +262,7 @@
                     while($row = $result->fetch(PDO::FETCH_ASSOC)) {
                         extract($row);
 
-                        $currentValue = $Revenue_Current_Value;
+                        $currentValue = $Savings_Control_Value;
                     }
 
                     $updatedValue = $currentValue - $data->budgets[$i]->value;
@@ -307,15 +298,12 @@
                             $result = $obStatement->savingsCreation();
 
                             if($result) {
-                                http_response_code(200);
-                                echo json_encode(array('message' => 'Orçamento cadastrado com sucesso'), JSON_UNESCAPED_UNICODE);
+                                $finalResult = true;
                             } else {
-                                http_response_code(500);
-                                echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                                $finalResult = false;
                             }
                         } else {
-                            http_response_code(500);
-                            echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                            $finalResult = false;
                         }
                     } else {
                         $result = $obSavingsControl->updateSavingsValue();
@@ -325,28 +313,31 @@
                             $result = $obStatement->savingsCreation();
 
                             if($result) {
-                                http_response_code(200);
-                                echo json_encode(array('message' => 'Orçamento cadastrado com sucesso'), JSON_UNESCAPED_UNICODE);
+                                $finalResult = true;
                             } else {
-                                http_response_code(500);
-                                echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                                $finalResult = false;
                             }
                         } else {
-                            http_response_code(500);
-                            echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                            $finalResult = false;
                         }
                     }
                 } else {
-                    http_response_code(500);
-                    echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                    $finalResult = false;
                 }
             } else {
-                http_response_code(500);
-                echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                $finalResult = false;
             }
             
-        }
+        }    
         
+    }
+
+    if($finalResult) {
+        http_response_code(200);
+        echo json_encode(array('message' => 'Orçamento cadastrado com sucesso'), JSON_UNESCAPED_UNICODE);
+    } else {
+        http_response_code(500);
+        echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
     }
 
 ?>

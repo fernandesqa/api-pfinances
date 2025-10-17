@@ -32,23 +32,16 @@
     $obGeneralFunctions = new generalFunctions();
 
     $personId;
-    date_default_timezone_set('America/Sao_Paulo');
-    $day = date('d');
-    $month = date('m');
-    $year = date('Y');
-    $statementDate = $day.'/'.$month.'/'.$year;
 
     $data = explode('/', $_SERVER['REQUEST_URI']);
     $userId = $data[count($data) - 6];
     $familyId = $data[count($data) - 4];
     $monthYear = $data[count($data) - 2];
 
-    $obStatementDetails->Statement_Details_Date = $statementDate;
     $obStatementDetails->Family_ID = $familyId;
     $obSavingsControl->Family_ID = $familyId;
     $obSavings->Family_ID = $familyId;
     $obRevenueAndSavings->Family_ID = $familyId;
-    $obSavings->Savings_Month_Year = $monthYear;
     $obBudget->Family_ID = $familyId;
     $obBudget->Budget_Month_Year = $monthYear;
 
@@ -78,12 +71,16 @@
     $data = json_decode(file_get_contents("php://input"));
     $totalSavings = count($data->savings);
 
+    $finalResult = false;
+
     //CADASTRA OS REGISTROS DE ECONOMIA NA BASE
     for($i=0; $i<$totalSavings; $i++) {
-
+        $statementDate = $data->savings[$i]->date;
+        $obStatementDetails->Statement_Details_Date = $statementDate;
         $obStatementDetails->Budget_ID = $data->savings[$i]->budgetId;
         $obStatementDetails->Statement_Details_Description = $data->savings[$i]->description;
         $obStatementDetails->Statement_Details_Value = '+ '.$obGeneralFunctions->convertToMonetary((string)$data->savings[$i]->value);
+        $obSavings->Savings_Date = $data->savings[$i]->date;
         $obSavingsControl->Savings_Control_Description = $data->savings[$i]->description;
         $obSavingsControl->Savings_Control_Value = $data->savings[$i]->value;
         $obSavings->Budget_ID = $data->savings[$i]->budgetId;
@@ -183,25 +180,19 @@
                         $result = $obStatementDetails->createStatementDetails();
 
                         if($result) {
-                            http_response_code(200);
-                            echo json_encode(array('message' => 'Economia cadastrada com sucesso'), JSON_UNESCAPED_UNICODE);
+                            $finalResult = true;
                         } else {
-                            http_response_code(500);
-                            echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                            $finalResult = false;
                         }
                     } else {
-                        http_response_code(500);
-                        echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                        $finalResult = false;
                     }
-
                 } else {
-                    http_response_code(500);
-                    echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                    $finalResult = false;
                 }
 
             } else {
-                http_response_code(500);
-                echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                $finalResult = false;
             }
             
         } else {
@@ -225,29 +216,31 @@
                             $result = $obStatementDetails->createStatementDetails();
 
                             if($result) {
-                                http_response_code(200);
-                                echo json_encode(array('message' => 'Economia cadastrada com sucesso'), JSON_UNESCAPED_UNICODE);
+                                $finalResult = true;
                             } else {
-                                http_response_code(500);
-                                echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                                $finalResult = false;
                             }
                         } else {
-                            http_response_code(500);
-                            echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                            $finalResult = false;
                         }
 
                     } else {
-                        http_response_code(500);
-                        echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                        $finalResult = false;
                     }
                 } else {
-                    http_response_code(500);
-                    echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                    $finalResult = false;
                 }
             } else {
-                http_response_code(500);
-                echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
+                $finalResult = false;
             }
         }
+    }
+
+    if($finalResult) {
+        http_response_code(200);
+        echo json_encode(array('message' => 'Economia cadastrada com sucesso'), JSON_UNESCAPED_UNICODE);
+    } else {
+        http_response_code(500);
+        echo json_encode(array('message' => 'Erro interno, por favor tente novamente mais tarde'), JSON_UNESCAPED_UNICODE);
     }
 ?>

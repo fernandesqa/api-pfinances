@@ -62,7 +62,7 @@
                       AND 
                         Family_ID = :family_id 
                       AND
-                        Budget_Month_Year = :month_year';
+                        Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"';
 
             //PREPARA A QUERY
             $stmt = $this->conn->prepare($query);
@@ -70,7 +70,6 @@
             //LIGA OS DADOS
             $stmt->bindParam(':family_id', $this->Family_ID);
             $stmt->bindParam(':budget_id', $this->Budget_Control_ID);
-            $stmt->bindParam(':month_year', $this->Budget_Month_Year);
 
             //EXECUTA A QUERY
             $stmt->execute();
@@ -106,6 +105,116 @@
             printf("Error: %s.\n", $stmt->error);
             return false;
         }
+
+      public function getBudgetsByPeriods() {
+        $query = 'SELECT 
+                    c.Budget_Control_Description AS "Description",
+                    b.Budget_Month_Year AS "Month_Year",
+                    b.Budget_Value AS "Value",
+                    b.Budget_Current_Value AS "Current_Value"
+                  FROM 
+                    '.$this->table.' AS b 
+                  INNER JOIN Budget_Control AS c 
+                  ON 
+                    b.Budget_Control_ID = c.Budget_Control_ID 
+                  WHERE b.Family_ID = :family_id 
+                  AND b.Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"';
+        //PREPARA A QUERY
+        $stmt = $this->conn->prepare($query);
+
+        //LIGA OS DADOS
+        $stmt->bindParam(':family_id', $this->Family_ID);
+
+        //EXECUTA A QUERY
+        $stmt->execute();
+
+        return $stmt;
+      }
+
+      public function getBudgetsAlreadySetOnPeriod() {
+        $query = 'SELECT 
+                    DISTINCT(bc.Budget_Control_Description) AS "Description"
+                  FROM 
+                    '.$this->table.' AS b 
+                  INNER JOIN 
+                    Budget_Control AS bc
+                  ON 
+                    bc.Budget_Control_ID = b.Budget_Control_ID 
+                  WHERE 
+                    b.Family_ID = :family_id
+                  AND 
+                    b.Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"';
+
+        //PREPARA A QUERY
+        $stmt = $this->conn->prepare($query);
+
+        //LIGA OS DADOS
+        $stmt->bindParam(':family_id', $this->Family_ID);
+
+        //EXECUTA A QUERY
+        $stmt->execute();
+
+        return $stmt;
+      }
+
+      public function getPreviousBudgets() {
+        $query = 'SELECT 
+                    bc.Budget_Control_Description AS "Description",
+                    SUM(b.Budget_Value) AS "Budget_Value"
+                  FROM 
+                    '.$this->table.' AS b 
+                  INNER JOIN 
+                    Budget_Control AS bc
+                  ON 
+                    bc.Budget_Control_ID = b.Budget_Control_ID 
+                  WHERE 
+                    b.Family_ID = :family_id
+                  AND 
+                    b.Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"
+                  GROUP BY 
+                    bc.Budget_Control_Description';
+
+        //PREPARA A QUERY
+        $stmt = $this->conn->prepare($query);
+
+        //LIGA OS DADOS
+        $stmt->bindParam(':family_id', $this->Family_ID);
+
+        //EXECUTA A QUERY
+        $stmt->execute();
+
+        return $stmt;
+      }
+
+      public function getBudgets() {
+        $query = 'SELECT 
+                    b.Budget_Control_ID AS "Budget_Control_ID",
+                    bc.Budget_Control_Description AS "Budget_Control_Description",
+                    SUM(b.Budget_Current_value) AS "Budget_Current_Value"
+                  FROM 
+                    '.$this->table.' AS b
+                  INNER JOIN 
+                    Budget_Control AS bc 
+                  ON 
+                    b.Budget_Control_ID = bc.Budget_Control_ID
+                  WHERE 
+                    b.Family_ID = :family_id 
+                  AND
+                    b.Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"
+                  GROUP BY 
+                    b.Budget_Control_ID';
+
+        //PREPARA A QUERY
+        $stmt = $this->conn->prepare($query);
+
+        //LIGA OS DADOS
+        $stmt->bindParam(':family_id', $this->Family_ID);
+
+        //EXECUTA A QUERY
+        $stmt->execute();
+
+        return $stmt;
+      }
     }
 
 ?>
