@@ -8,7 +8,7 @@
         public $Person_ID;
         public $Family_ID;
         public $Budget_ID;
-        public $Savings_Month_Year;
+        public $Savings_Date;
         public $Savings_Value;
 
         // CONSTRUTOR COM BANCO DE DADOS
@@ -24,7 +24,7 @@
                         :person_id,
                         :family_id,
                         :budget_id,
-                        :savings_month_year,
+                        :savings_date,
                         :savings_value
                       )';
 
@@ -36,7 +36,7 @@
             $stmt->bindParam(':person_id', $this->Person_ID);
             $stmt->bindParam(':family_id', $this->Family_ID);
             $stmt->bindParam(':budget_id', $this->Budget_ID);
-            $stmt->bindParam(':savings_month_year', $this->Savings_Month_Year);
+            $stmt->bindParam(':savings_date', $this->Savings_Date);
             $stmt->bindParam(':savings_value', $this->Savings_Value);
 
             //EXECUTA A QUERY
