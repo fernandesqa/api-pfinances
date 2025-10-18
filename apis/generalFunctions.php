@@ -111,8 +111,16 @@
                         }
                         break;
                     case 6:
-                        $value = str_replace('.', ',', $value);
-                        $monetaryValue = 'R$ '.substr($value, 0, 1).'.'.substr($value, 1, 4).substr($value, 5, 6).'0';
+                        if(str_contains($value, '.')) {
+                            if(substr($value, 4, 5)=='.') {
+                                $value = str_replace('.', ',', $value);
+                                $monetaryValue = 'R$ '.substr($value, 0, 1).'.'.substr($value, 1, 6).'0';
+                            } else {
+                                $monetaryValue = 'R$ '.str_replace('.', ',', $value);
+                            }
+                        } else {
+                            $monetaryValue = 'R$ '.substr($value, 0, 3)+'.'.substr($value, 3, 6).',00';
+                        }
                         break;
                     case 7:
                         $value = str_replace('.', ',', $value);
