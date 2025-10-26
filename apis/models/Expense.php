@@ -59,6 +59,21 @@
             printf("Error: %s.\n", $stmt->error);
             return false;
         }
+
+        public function totalExpenses() {
+            $query = 'SELECT 
+                        COUNT(*) AS "Total"
+                      FROM 
+                        '.$this->table.'';
+
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //EXECUTA A QUERY
+            $stmt->execute();
+
+            return $stmt;
+        }
     }
 
 ?>

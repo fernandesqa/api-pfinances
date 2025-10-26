@@ -36,8 +36,15 @@
     $day = date('d');
     $month = date('m');
     $year = date('Y');
-    $statementDate = $day.'/'.$month.'/'.$year;
 
+    $statementDate = '';
+
+    if(strlen($month)==1) {
+        $statementDate = $day.'/'.'0'.$month.'/'.$year;    
+    } else {
+        $statementDate = $day.'/'.$month.'/'.$year;
+    }
+    
     $obStatement->Statement_Date = $statementDate;
 
     $url = explode('/', $_SERVER['REQUEST_URI']);

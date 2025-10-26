@@ -20,6 +20,8 @@
     include_once __DIR__.'/models/StatementDetails.php';
     include_once __DIR__.'/models/Budget.php';
     include_once __DIR__.'/models/BudgetControl.php';
+    include_once __DIR__.'/models/Expense.php';
+    include_once __DIR__.'/models/FixedExpense.php';
     include_once __DIR__.'/models/ExpenseCategory.php';
     include_once __DIR__.'/models/Savings.php';
     include_once __DIR__.'/models/SavingsControl.php';
@@ -1553,6 +1555,18 @@
                         }
                     break;
                 
+                default:
+                    http_response_code(403);
+                    echo json_encode('Method not supported');
+            }
+            break;
+        
+        case str_contains($_SERVER['REQUEST_URI'], $prefixApi.'/expenses/users/') && str_contains($_SERVER['REQUEST_URI'], '/create'):
+            //VERIFICA O MÉTODO ENVIADO NA REQUEST
+            switch($_SERVER['REQUEST_METHOD']) {
+                case 'POST':
+                    require __DIR__ .'/api/v1/expense/create.php';
+                    break;
                 default:
                     http_response_code(403);
                     echo json_encode('Method not supported');
