@@ -74,6 +74,32 @@
 
             return $stmt;
         }
+
+        public function getFixedExpenseByPeriod() {
+            $query = 'SELECT 
+                        * 
+                      FROM 
+                        '.$this->table.' 
+                      WHERE 
+                        Budget_ID = :budget_id 
+                      AND
+                        Expense_ID = :expense_id
+                      AND 
+                        Expense_Billing_Month_Year = :expense_billing_month_year';
+
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS
+            $stmt->bindParam(':budget_id', $this->Budget_ID);
+            $stmt->bindParam(':expense_id', $this->Expense_ID);
+            $stmt->bindParam(':expense_billing_month_year', $this->Expense_Billing_Month_Year);
+
+            //EXECUTA A QUERY
+            $stmt->execute();
+
+            return $stmt;
+        }
     }
 
 ?>

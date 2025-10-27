@@ -123,7 +123,9 @@
         $obExpense->Expense_Category_ID = $data->expenses[$i]->categoryId;
         $installmentsExpense;
         $currentMonth = date('m');
+        $currentYear = date('Y');
         $month = '';
+        $year = '';
 
         if($data->expenses[$i]->installmentsExpense==false) {
             $installmentsExpense = 0;
@@ -133,10 +135,12 @@
 
             if(strlen($data->expenses[$i]->billingMonthYear)==5) {
                 $month = substr($data->expenses[$i]->billingMonthYear, 0, 1);
+                $year = substr($data->expenses[$i]->billingMonthYear, 1, 5);
             } else {
                 $month = substr($data->expenses[$i]->billingMonthYear, 0, 2);
+                $year = substr($data->expenses[$i]->billingMonthYear, 2, 6);
             }
-            if(intval($month) <= intval($currentMonth)) {
+            if(intval($month) <= intval($currentMonth) && intval($year) <= intval($currentYear)) {
                 $statementDate = explode(' ', $data->expenses[$i]->date)[0];
             }
         }

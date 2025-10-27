@@ -26,14 +26,20 @@
                         Statement_Description,
                         Statement_Value,
                         Statement_Date,
-                        Family_ID
+                        Statement_Origin,
+                        Statement_Destination,
+                        Family_ID,
+                        Budget_ID
                       ) 
                       VALUES (
                         :statement_author,
                         :statement_description,
                         :statement_value,
                         :statement_date,
-                        :family_id
+                        :statement_origin,
+                        :statement_destination,
+                        :family_id,
+                        :budget_id
                       )';
             
             //PREPARA A QUERY
@@ -44,7 +50,10 @@
             $stmt->bindParam(':statement_description', $this->Statement_Description);
             $stmt->bindParam(':statement_value', $this->Statement_Value);
             $stmt->bindParam(':statement_date', $this->Statement_Date);
+            $stmt->bindParam(':statement_origin', $this->Statement_Origin);
+            $stmt->bindParam(':statement_destination', $this->Statement_Destination);
             $stmt->bindParam(':family_id', $this->Family_ID);
+            $stmt->bindParam(':budget_id', $this->Budget_ID);
             
             //EXECUTA A QUERY
             if($stmt->execute()) {

@@ -1565,7 +1565,43 @@
             //VERIFICA O MÉTODO ENVIADO NA REQUEST
             switch($_SERVER['REQUEST_METHOD']) {
                 case 'POST':
-                    require __DIR__ .'/api/v1/expense/create.php';
+                    $data = explode('/', $_SERVER['REQUEST_URI']);
+                    $userId = $data[count($data) - 4];
+                    $familyId = $data[count($data) - 2];
+                    if($userId != 'users' && 
+                        $userId != '/' && 
+                        $userId != '' &&
+                        $userId != 'families' &&
+                        $userId != 'create' &&
+                        $familyId != 'users' &&
+                        $familyId != '/' &&
+                        $familyId != '' &&
+                        $familyId != 'families' &&
+                        $familyId != 'create') {
+                            
+                            //VALIDA O ACCESSTOKEN E ENTÃO BUSCA OS CONVITES
+                            $all_headers = getallheaders();
+                            $authorizationHeaderInformed = $generalFunctions->xApiKeyHeaderInformed($all_headers);
+                            if($authorizationHeaderInformed) {
+                                $accessToken = $generalFunctions->getAccessToken($all_headers);
+                                $obAccessToken->User_ID = $userId;
+                                $obAccessToken->Session_Access_Token = $accessToken;
+                                if($obAccessToken->isTokenValid()) {
+                                    //REGISTRA AS DESPESAS
+                                    require __DIR__ .'/api/v1/expense/create.php';
+                                } else {
+                                    http_response_code(401);
+                                    echo json_encode('Invalid token');    
+                                }
+                            } else {
+                                http_response_code(400);
+                                echo json_encode('x-api-key header is required');
+                            }
+
+                        } else {
+                            http_response_code(401);
+                            echo json_encode('userId and familyId are required');
+                        }
                     break;
                 default:
                     http_response_code(403);

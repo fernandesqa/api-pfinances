@@ -93,5 +93,55 @@
 
             return $stmt;
         }
+
+        public function getFixedExpense() {
+          $query = 'SELECT 
+                      *
+                    FROM 
+                      '.$this->table.' 
+                    WHERE 
+                      Budget_ID = :budget_id 
+                    AND
+                      Family_ID = :family_id 
+                    AND 
+                      Fixed_Expense_End_Month_Year = ""';
+          
+          //PREPARA A QUERY
+          $stmt = $this->conn->prepare($query);
+
+          //LIGA OS DADOS
+          $stmt->bindParam(':budget_id', $this->Budget_ID);
+          $stmt->bindParam(':family_id', $this->Family_ID);
+
+          //EXECUTA A QUERY
+          $stmt->execute();
+
+          return $stmt;
+        }
+
+        public function getInstallmentsExpenses() {
+          $query = 'SELECT 
+                      *
+                    FROM 
+                      '.$this->table.' 
+                    WHERE 
+                      Budget_ID = :budget_id 
+                    AND
+                      Family_ID = :family_id 
+                    AND 
+                      Fixed_Expense_End_Month_Year != ""';
+          
+          //PREPARA A QUERY
+          $stmt = $this->conn->prepare($query);
+
+          //LIGA OS DADOS
+          $stmt->bindParam(':budget_id', $this->Budget_ID);
+          $stmt->bindParam(':family_id', $this->Family_ID);
+
+          //EXECUTA A QUERY
+          $stmt->execute();
+
+          return $stmt;
+        }
     }
 ?>
