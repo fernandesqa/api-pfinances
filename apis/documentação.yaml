@@ -1795,6 +1795,56 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/InternalError'
+                
+  /expenses/users/{userId}/families/{familyId}/current-month:
+    get:
+      tags:
+        - Despesas
+      summary: Consulta o total de despesas do mês atual
+      description: Realiza a consulta do total de despesas do mês atual na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotalExpense'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/TotalExpense'
+                
+        '404':
+          description: Nenhum dado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+        
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
         
   
 components:
@@ -2472,3 +2522,22 @@ components:
         message:
           type: string
           example: Despesa(s) registrada(s) com sucesso.
+          
+          
+    TotalExpense:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              month:
+                type: string
+                example: 10
+              year:
+                type: string
+                example: 2024
+              value:
+                type: integer
+                example: 5600.50

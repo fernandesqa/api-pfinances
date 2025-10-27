@@ -466,7 +466,240 @@
                         $result = $obStatement->savingsCreation();
 
                         if($result) {
-                            $finalResult = true;
+                            //VERIFICA SE HÁ DESPESAS FIXAS VINCULADAS AO ORÇAMENTO
+                            $obFixedExpense->Budget_ID = $budgetId;
+                            $obFixedExpense->Family_ID = $familyId;
+
+                            $dateTime;
+                            $month;
+                            $year;
+
+                            if(strlen($monthYear)==5) {
+                                $month = substr($monthYear, 0, 1);
+                                $year = substr($monthYear, 1, 5);
+                            } else {
+                                $month = substr($monthYear, 0, 2);
+                                $year = substr($monthYear, 2, 6);
+                            }
+
+                            if(intval($month)==intval(date('m'))) {
+                                $day = date('d');
+                                $time = date('H:i:s');
+                                if(strlen($month)==1){
+                                    $month = '0'.$month;
+                                }
+                                $date = $day.'/'.$month.'/'.$year;
+                                $dateTime = $day.'/'.$month.'/'.$year.' '.$time;
+                                $obStatementDetails->Statement_Details_Date = $day.'/'.$month.'/'.$year;
+                            } else {
+                                $day = '01';
+                                $time = date('H:i:s');
+                                if(strlen($month)==1){
+                                    $month = '0'.$month;
+                                }
+                                $date = $day.'/'.$month.'/'.$year;
+                                $dateTime = $day.'/'.$month.'/'.$year.' '.$time;
+                                $obStatementDetails->Statement_Details_Date = $day.'/'.$month.'/'.$year;
+                            }
+
+                            $result = $obFixedExpense->getFixedExpense();
+
+                            $num = $result->rowCount();
+
+                            $arr_fixed_expenses = array();
+                            $arr_fixed_expenses['data'] = array();
+
+                            if($num>0) {
+                                while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                                    extract($row);
+
+                                    $arr_item_fixed_expenses = array(
+                                        "Fixed_Expense_ID" => $Fixed_Expense_ID,
+                                        "Person_ID" => $Person_ID,
+                                        "Family_ID" => $Family_ID,
+                                        "Budget_ID" => $Budget_ID,
+                                        "Expense_Category_ID" => $Expense_Category_ID,
+                                        "Expense_Installments_Expense" => 0,
+                                        "Expense_Date" => $dateTime,
+                                        "Expense_Billing_Month_Year" => $monthYear,
+                                        "Expense_Value" => $Fixed_Expense_Value,
+                                        "Statement_Details_Value" => '- '.$obGeneralFunctions->convertToMonetary((string)$Fixed_Expense_Value),
+                                        "Expense_Description" => $Fixed_Expense_Description,
+                                        "Statement_Details_Description" => $Fixed_Expense_Description
+                                    );
+
+                                    array_push($arr_fixed_expenses['data'], $arr_item_fixed_expenses);
+                                }
+
+                                for($j=0; $j<count($arr_fixed_expenses['data']); $j++) {
+                                    $obExpense->Expense_ID = $arr_fixed_expenses['data'][$j]["Fixed_Expense_ID"];
+                                    $obExpense->Person_ID = $arr_fixed_expenses['data'][$j]["Person_ID"];
+                                    $obExpense->Family_ID = $arr_fixed_expenses['data'][$j]["Family_ID"];
+                                    $obExpense->Budget_ID = $arr_fixed_expenses['data'][$j]["Budget_ID"];
+                                    $obExpense->Expense_Category_ID = $arr_fixed_expenses['data'][$j]["Expense_Category_ID"];
+                                    $obExpense->Expense_Installments_Expense = $arr_fixed_expenses['data'][$j]["Expense_Installments_Expense"];
+                                    $obExpense->Expense_Date = $arr_fixed_expenses['data'][$j]["Expense_Date"];
+                                    $obExpense->Expense_Billing_Month_Year = $arr_fixed_expenses['data'][$j]["Expense_Billing_Month_Year"];
+                                    $obExpense->Expense_Value = $arr_fixed_expenses['data'][$j]["Expense_Value"];
+                                    $obStatementDetails->Statement_Details_Value = $arr_fixed_expenses['data'][$j]["Statement_Details_Value"];
+                                    $obExpense->Expense_Description = $arr_fixed_expenses['data'][$j]["Expense_Description"];
+                                    $obStatementDetails->Statement_Details_Description = $arr_fixed_expenses['data'][$j]["Statement_Details_Description"];
+
+                                    //VERIFICA SE AS DESPESAS FIXAS JÁ FORAM CADASTRADAS NO ATUAL PERÍODO
+                                    $result = $obExpense->getFixedExpenseByPeriod();
+
+                                    $num = $result->rowCount();
+
+                                    if($num==0) {
+                                        $currentValue;
+                                        $updatedValue;
+                                        $result = $obBudget->getBudgetCurrentValue();
+
+                                        while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                                            extract($row);
+
+                                            $currentValue = $Budget_Current_Value;
+                                        }
+
+                                        $updatedValue = $currentValue - $obExpense->Expense_Value;
+                                        $obBudget->Budget_Current_Value = $updatedValue;
+
+                                        $result = $obExpense->createExpense();
+
+                                        if($result) {
+                                            // ATUALIZA O VALOR DO ORÇAMENTO
+                                            $result = $obBudget->updateBudgetCurrentValue();
+                                            if($result) {
+                                                //REGISTRA OS DADOS NO EXTRATO
+                                                $result = $obStatementDetails->createStatementDetails();
+
+                                                if($result) {
+                                                    $finalResult = true;
+                                                } else {
+                                                    $finalResult = false;
+                                                }
+                                            } else {
+                                                $finalResult = false;
+                                            }
+                                        } else {
+                                            $finalResult = false;
+                                        }
+                                    }
+                                }
+                            }
+
+                            //VERIFICA SE HÁ DESPESAS PARCELADAS ATIVAS NO MÊS E ANO ATUAL
+                            $result = $obFixedExpense->getInstallmentsExpenses();
+
+                            $time = date('H:i:s');
+
+                            $num = $result->rowCount();
+
+                            $arr_installments_expenses = array();
+                            $arr_installments_expenses['data'] = array();
+
+                            if($num>0) {
+                                while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                                    extract($row);
+
+                                    $arr_item_installments_expenses = array(
+                                        "Last_Installments_Expense" => $Fixed_Expense_End_Month_Year,
+                                        "Fixed_Expense_ID" => $Fixed_Expense_ID,
+                                        "Person_ID" => $Person_ID,
+                                        "Family_ID" => $Family_ID,
+                                        "Budget_ID" => $Budget_ID,
+                                        "Expense_Category_ID" => $Expense_Category_ID,
+                                        "Expense_Installments_Expense" => 1,
+                                        "Expense_Date" => $date.' '.$time,
+                                        "Expense_Billing_Month_Year" => $monthYear,
+                                        "Expense_Value" => $Fixed_Expense_Value,
+                                        "Statement_Details_Value" => '- '.$obGeneralFunctions->convertToMonetary((string)$Fixed_Expense_Value),
+                                        "Expense_Description" => $Fixed_Expense_Description,
+                                        "Statement_Details_Description" => $Fixed_Expense_Description
+                                    );
+
+                                    array_push($arr_installments_expenses['data'], $arr_item_installments_expenses);
+                                }
+
+                                for($j=0; $j<count($arr_installments_expenses['data']); $j++) {
+                                    $lastInstallmentsExpense = $arr_installments_expenses['data'][$j]["Last_Installments_Expense"];
+                                    $obExpense->Expense_ID = $arr_installments_expenses['data'][$j]["Fixed_Expense_ID"];
+                                    $obExpense->Person_ID = $arr_installments_expenses['data'][$j]["Person_ID"];
+                                    $obExpense->Family_ID = $arr_installments_expenses['data'][$j]["Family_ID"];
+                                    $obExpense->Budget_ID = $arr_installments_expenses['data'][$j]["Budget_ID"];
+                                    $obExpense->Expense_Category_ID = $arr_installments_expenses['data'][$j]["Expense_Category_ID"];
+                                    $obExpense->Expense_Installments_Expense = $arr_installments_expenses['data'][$j]["Expense_Installments_Expense"];
+                                    $obExpense->Expense_Date = $arr_installments_expenses['data'][$j]["Expense_Date"];
+                                    $obExpense->Expense_Billing_Month_Year = $arr_installments_expenses['data'][$j]["Expense_Billing_Month_Year"];
+                                    $obExpense->Expense_Value = $arr_installments_expenses['data'][$j]["Expense_Value"];
+                                    $obStatementDetails->Statement_Details_Value = $arr_installments_expenses['data'][$j]["Statement_Details_Value"];
+                                    $obExpense->Expense_Description = $arr_installments_expenses['data'][$j]["Expense_Description"];
+                                    $obStatementDetails->Statement_Details_Description = $arr_installments_expenses['data'][$j]["Statement_Details_Description"];
+
+                                    //VERIFICA SE AS DESPESAS PARCELADAS JÁ FORAM CADASTRADAS NO ATUAL PERÍODO
+                                    $result = $obExpense->getFixedExpenseByPeriod();
+
+                                    $num = $result->rowCount();
+
+                                    if($num==0) {
+                                        $lastMonth;
+                                        $lastYear;
+                                        $month;
+                                        $year;
+                                        if(strlen($lastInstallmentsExpense)==5) {
+                                            $lastMonth = substr($lastInstallmentsExpense, 0, 1);
+                                            $lastYear = substr($lastInstallmentsExpense, 1, 5);
+                                        } else {
+                                            $lastMonth = substr($lastInstallmentsExpense, 0, 2);
+                                            $lastYear = substr($lastInstallmentsExpense, 2, 6);
+                                        }
+                                        
+                                        if(strlen($monthYear)==5) {
+                                            $month = substr($monthYear, 0, 1);
+                                            $year = substr($monthYear, 1, 5);
+                                        } else {
+                                            $month = substr($monthYear, 0, 2);
+                                            $year = substr($monthYear, 2, 6);
+                                        }
+
+                                        if(intval($lastMonth)>=intval($month) && intval($lastYear)>=intval($year) || intval($lastMonth)<intval($month) && intval($lastYear)>=intval($year)) {
+                                            $currentValue;
+                                            $updatedValue;
+                                            $result = $obBudget->getBudgetCurrentValue();
+
+                                            while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                                                extract($row);
+
+                                                $currentValue = $Budget_Current_Value;
+                                            }
+
+                                            $updatedValue = $currentValue - $obExpense->Expense_Value;
+                                            $obBudget->Budget_Current_Value = $updatedValue;
+
+                                            $result = $obExpense->createExpense();
+
+                                            if($result) {
+                                                // ATUALIZA O VALOR DO ORÇAMENTO
+                                                $result = $obBudget->updateBudgetCurrentValue();
+                                                if($result) {
+                                                    //REGISTRA OS DADOS NO EXTRATO
+                                                    $result = $obStatementDetails->createStatementDetails();
+
+                                                    if($result) {
+                                                        $finalResult = true;
+                                                    } else {
+                                                        $finalResult = false;
+                                                    }
+                                                } else {
+                                                    $finalResult = false;
+                                                }   
+                                            } else {
+                                                $finalResult = false;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         } else {
                             $finalResult = false;
                         }
