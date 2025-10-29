@@ -1268,6 +1268,61 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalError'
                 
+  /total-revenues/users/{userId}/families/{familyId}/periods/{monthYear}:
+    get:
+      tags:
+        - Receitas
+      summary: Consulta o total de receitas do período desejado
+      description: Realiza a consulta do total de receitas do período desejado na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: monthYear
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotalRevenue'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/TotalRevenue'
+                
+        '404':
+          description: Nenhum dado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+        
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
   /pending-issues/send-email:
     post:
       tags:
@@ -1339,6 +1394,57 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/BudgetCreated'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /budgets/users/{userId}/families/{familyId}/periods/{monthYear}:
+    get:
+      tags:
+        - Orçamentos
+      summary: Consulta o resumo de despesas ou economias por orçamento
+      description: Realiza a consulta de dados de despesas e economias separados por categoria de despesas
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: monthYear
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetsSummary'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/BudgetsSummary'
+        '404':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
         '500':
           description: Internal Error
           content:
@@ -1815,6 +1921,61 @@ paths:
           schema:
             type: integer
             format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotalExpense'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/TotalExpense'
+                
+        '404':
+          description: Nenhum dado encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+        
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
+  /total-expenses/users/{userId}/families/{familyId}/periods/{monthYear}:
+    get:
+      tags:
+        - Despesas
+      summary: Consulta o total de despesas do período desejado
+      description: Realiza a consulta do total de despesas do período desejado na base
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: monthYear
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Successful operation
@@ -2493,28 +2654,33 @@ components:
     CreateExpenses:
       type: object
       properties:
-        date:
-          type: string
-          example: "20/03/2025 16:35:25"
-        description:
-          type: string
-        value:
-          type: number
-          example: 245.15
-        categoryId:
-          type: integer
-        budgetId:
-          type: integer
-        fixedExpense:
-          type: boolean
-          example: false
-        installmentsExpense:
-          type: boolean
-          example: false
-        billingMonthYear:
-          type: string
-        lastBillingMonthYear:
-          type: string
+        expenses:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                example: "20/03/2025 16:35:25"
+              description:
+                type: string
+              value:
+                type: number
+                example: 245.15
+              categoryId:
+                type: integer
+              budgetId:
+                type: integer
+              fixedExpense:
+                type: boolean
+                example: false
+              installmentsExpense:
+                type: boolean
+                example: false
+              billingMonthYear:
+                type: string
+              lastBillingMonthYear:
+                type: string
           
     ExpensesCreated:
       type: object
@@ -2538,6 +2704,31 @@ components:
               year:
                 type: string
                 example: 2024
-              value:
+              value: 
                 type: integer
                 example: 5600.50
+                
+                
+    BudgetsSummary:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              description:
+                type: string
+              icon:
+                type: string
+              totalSet:
+                type: number
+                example: 3587.50
+              totalUsed:
+                type: number
+                example: 2568.40
+              totalAvailable:
+                type: number
+                example: 1019.10
+  
+    
