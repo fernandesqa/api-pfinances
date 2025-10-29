@@ -245,6 +245,31 @@
 
         return $stmt;
       }
+
+      public function getBudgetIdByPeriod() {
+        $query = 'SELECT 
+                    Budget_Control_ID
+                  FROM 
+                    '.$this->table.' 
+                  WHERE 
+                    Budget_Control_ID = :budget_id 
+                  AND
+                    Family_ID = :family_id
+                  AND 
+                    Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"';
+
+        //PREPARA A QUERY
+        $stmt = $this->conn->prepare($query);
+
+        //LIGA OS DADOS 
+        $stmt->bindParam(':budget_id', $this->Budget_Control_ID);
+        $stmt->bindParam(':family_id', $this->Family_ID);
+
+        //EXECUTA A QUERY
+        $stmt->execute();
+
+        return $stmt;
+      }
     }
 
 ?>

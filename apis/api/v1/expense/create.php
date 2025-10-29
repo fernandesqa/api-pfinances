@@ -88,13 +88,13 @@
             $obFixedExpense->Fixed_Expense_End_Month_Year = $data->expenses[$i]->lastBillingMonthYear;
             $obFixedExpense->Fixed_Expense_Value = $data->expenses[$i]->value;
             $obFixedExpense->Fixed_Expense_Description = $data->expenses[$i]->description;
+            $obExpense->Budget_ID = $data->expenses[$i]->budgetId;
 
             $result = $obFixedExpense->createFixedExpense();
-
+            
             if($result) {
 
                 $result = $obFixedExpense->getFixedExpenseId();
-
                 $num = $result->rowCount();
 
                 if($num>0) {
@@ -142,6 +142,8 @@
             }
             if(intval($month) <= intval($currentMonth) && intval($year) <= intval($currentYear)) {
                 $statementDate = explode(' ', $data->expenses[$i]->date)[0];
+            } else {
+                $statementDate = '01/'.$month.'/'.$year;
             }
         }
         $obExpense->Expense_Installments_Expense = $installmentsExpense;
@@ -187,7 +189,49 @@
                 $finalResult = false;
             }
         } else {
-            $finalResult = true;
+            //Verifica se o orçamento do mês futuro já foi definido, se sim, então registra a despesa
+            $result = $obBudget->getBudgetIdByPeriod();
+
+            $num = $result->rowCount();
+            
+            if($num>0) {
+                $currentValue;
+                $updatedValue;
+                $result = $obBudget->getBudgetCurrentValue();
+
+                while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    extract($row);
+
+                    $currentValue = $Budget_Current_Value;
+                }
+                
+                $updatedValue = $currentValue - $data->expenses[$i]->value;
+                
+                $obBudget->Budget_Current_Value = $updatedValue;
+
+                $result = $obExpense->createExpense();
+
+                if($result) {
+                    // ATUALIZA O VALOR DO ORÇAMENTO
+                    $result = $obBudget->updateBudgetCurrentValue();
+                    
+                    if($result) {
+                        $result = $obStatementDetails->createStatementDetails();
+
+                        if($result) {
+                            $finalResult = true;
+                        } else {
+                            $finalResult = false;    
+                        }
+                    } else {
+                        $finalResult = false;  
+                    }
+                } else {
+                    $finalResult = false;
+                }
+            } else {
+                $finalResult = true;
+            }
         }
     }
 
