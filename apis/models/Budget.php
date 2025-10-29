@@ -215,6 +215,36 @@
 
         return $stmt;
       }
+
+      public function getBudgetUsageData() {
+        $query = 'SELECT 
+                    bc.Budget_Control_Description AS "Budget_Description",
+                    bc.Budget_Control_Icon_Name AS "Icon",
+                    b.Budget_Value AS "Total_Set",
+                      b.Budget_Current_Value AS "Total_Used",
+                      b.Budget_Value - b.Budget_Current_Value AS "Total_Available"
+                  FROM 
+                    '.$this->table.' AS b
+                  INNER JOIN
+                    `Budget_Control` AS bc
+                  ON 
+                    b.Budget_Control_ID = bc.Budget_Control_ID
+                  WHERE 
+                    b.Family_ID = :family_id
+                  AND
+                    b.Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"';
+
+        //PREPARA A QUERY
+        $stmt = $this->conn->prepare($query);
+
+        //LIGA OS DADOS
+        $stmt->bindParam(':family_id', $this->Family_ID);
+
+        //EXECUTA A QUERY
+        $stmt->execute();
+
+        return $stmt;
+      }
     }
 
 ?>
