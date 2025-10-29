@@ -221,8 +221,8 @@
                     bc.Budget_Control_Description AS "Budget_Description",
                     bc.Budget_Control_Icon_Name AS "Icon",
                     b.Budget_Value AS "Total_Set",
-                      b.Budget_Current_Value AS "Total_Used",
-                      b.Budget_Value - b.Budget_Current_Value AS "Total_Available"
+                      b.Budget_Current_Value AS "Total_Available",
+                      b.Budget_Value - b.Budget_Current_Value AS "Total_Used"
                   FROM 
                     '.$this->table.' AS b
                   INNER JOIN
@@ -238,6 +238,31 @@
         $stmt = $this->conn->prepare($query);
 
         //LIGA OS DADOS
+        $stmt->bindParam(':family_id', $this->Family_ID);
+
+        //EXECUTA A QUERY
+        $stmt->execute();
+
+        return $stmt;
+      }
+
+      public function getBudgetIdByPeriod() {
+        $query = 'SELECT 
+                    Budget_Control_ID
+                  FROM 
+                    '.$this->table.' 
+                  WHERE 
+                    Budget_Control_ID = :budget_id 
+                  AND
+                    Family_ID = :family_id
+                  AND 
+                    Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"';
+
+        //PREPARA A QUERY
+        $stmt = $this->conn->prepare($query);
+
+        //LIGA OS DADOS 
+        $stmt->bindParam(':budget_id', $this->Budget_Control_ID);
         $stmt->bindParam(':family_id', $this->Family_ID);
 
         //EXECUTA A QUERY

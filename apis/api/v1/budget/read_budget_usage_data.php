@@ -28,26 +28,12 @@
         while($row = $result->fetch(PDO::FETCH_ASSOC)) {
             extract($row);
 
-            $totalAvailable;
-            $totalUsed;
-
-            if(floatval($Total_Available)==0) {
-                $totalAvailable = floatval($Total_Used);
-                $totalUsed = 0;
-            } else if(floatval($Total_Used)==0) {
-                $totalAvailable = 0;
-                $totalUsed = $Total_Available;
-            } else {
-                $totalUsed = $Total_Used;
-                $totalAvailable = $Total_Available;
-            }
-
             $arr_budgets_item = array(
                 'description' => $Budget_Description,
                 'icon' => $Icon,
                 'totalSet' => floatval($Total_Set),
-                'totalUsed' => floatval($totalUsed),
-                'totalAvailable' => floatval($totalAvailable)
+                'totalUsed' => floatval($Total_Used),
+                'totalAvailable' => floatval($Total_Available)
             );
 
             array_push($arr_budgets['data'], $arr_budgets_item);
