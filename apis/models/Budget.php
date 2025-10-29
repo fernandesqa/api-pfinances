@@ -221,8 +221,8 @@
                     bc.Budget_Control_Description AS "Budget_Description",
                     bc.Budget_Control_Icon_Name AS "Icon",
                     b.Budget_Value AS "Total_Set",
-                      b.Budget_Current_Value AS "Total_Used",
-                      b.Budget_Value - b.Budget_Current_Value AS "Total_Available"
+                      b.Budget_Current_Value AS "Total_Available",
+                      b.Budget_Value - b.Budget_Current_Value AS "Total_Used"
                   FROM 
                     '.$this->table.' AS b
                   INNER JOIN
