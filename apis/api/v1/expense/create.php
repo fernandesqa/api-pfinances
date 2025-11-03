@@ -120,6 +120,7 @@
         $obExpense->Budget_ID = $data->expenses[$i]->budgetId;
         $obStatementDetails->Budget_ID = $data->expenses[$i]->budgetId;
         $obBudget->Budget_Control_ID = $data->expenses[$i]->budgetId;
+        $obBudget->Budget_Origin_ID = $data->expenses[$i]->revenueId;
         $obExpense->Expense_Category_ID = $data->expenses[$i]->categoryId;
         $installmentsExpense;
         $currentMonth = date('m');
