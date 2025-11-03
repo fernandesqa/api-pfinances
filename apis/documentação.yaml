@@ -2534,6 +2534,9 @@ components:
               budgetId:
                 type: integer
                 example: 4
+              revenueId:
+                type: integer
+                example: 50
               budgetDescription:
                 type: string
               budgetCurrentValue:
@@ -2671,6 +2674,8 @@ components:
                 type: integer
               budgetId:
                 type: integer
+              revenueId:
+                type: integer
               fixedExpense:
                 type: boolean
                 example: false
@@ -2730,5 +2735,16 @@ components:
               totalAvailable:
                 type: number
                 example: 1019.10
-  
-    
+              categories:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    category:
+                      type: string
+                    percentage:
+                      type: number
+                      example: 0.15
+                    value:
+                      type: number
+                      example: 250.75

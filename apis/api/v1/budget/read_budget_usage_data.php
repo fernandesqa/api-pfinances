@@ -10,12 +10,17 @@
     //INSTACIA O OBJETO BUDGET
     $obBudget = new Budget($db);
 
+    //INSTANCIA O OBJETO EXPENSE
+    $obExpense = new Expense($db);
+
     $data = explode('/', $_SERVER['REQUEST_URI']);
     $familyId = $data[count($data) - 3];
     $monthYear = $data[count($data) - 1];
 
     $obBudget->Family_ID = $familyId;
     $obBudget->Budget_Month_Year = $monthYear;
+    $obExpense->Family_ID = $familyId;
+    $obExpense->Expense_Billing_Month_Year = $monthYear;
     
     $result = $obBudget->getBudgetUsageData();
 
@@ -27,13 +32,38 @@
 
         while($row = $result->fetch(PDO::FETCH_ASSOC)) {
             extract($row);
+            
+            $obExpense->Budget_ID = $Budget_Control_ID;
+
+            $expenseResult = $obExpense->getCategoriesValue();
+
+            $num = $expenseResult->rowCount();
+
+            $arr_categories['categories'] = array();
+
+            if($num>0) {
+                while($expenseRow = $expenseResult->fetch(PDO::FETCH_ASSOC)) {
+                    extract($expenseRow);
+
+                    $arr_categories_item = array(
+                        "category" => $Category,
+                        "percentage" => $Percentage,
+                        "value" => $Value
+                    );
+
+                    array_push($arr_categories['categories'], $arr_categories_item);
+                }
+            }
+
+
 
             $arr_budgets_item = array(
                 'description' => $Budget_Description,
                 'icon' => $Icon,
                 'totalSet' => floatval($Total_Set),
                 'totalUsed' => floatval($Total_Used),
-                'totalAvailable' => floatval($Total_Available)
+                'totalAvailable' => floatval($Total_Available),
+                'categories' => $arr_categories['categories']
             );
 
             array_push($arr_budgets['data'], $arr_budgets_item);

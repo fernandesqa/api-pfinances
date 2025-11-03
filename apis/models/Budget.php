@@ -60,6 +60,8 @@
                       WHERE 
                         Budget_Control_ID = :budget_id 
                       AND 
+                        Budget_Origin_ID = :revenue_id
+                      AND
                         Family_ID = :family_id 
                       AND
                         Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"';
@@ -70,6 +72,7 @@
             //LIGA OS DADOS
             $stmt->bindParam(':family_id', $this->Family_ID);
             $stmt->bindParam(':budget_id', $this->Budget_Control_ID);
+            $stmt->bindParam(':revenue_id', $this->Budget_Origin_ID);
 
             //EXECUTA A QUERY
             $stmt->execute();
@@ -84,9 +87,11 @@
                       WHERE 
                         Budget_Control_ID = :budget_id
                       AND
+                        Budget_Origin_ID = :revenue_id
+                      AND
                         Family_ID = :family_id
                       AND 
-                        Budget_Month_Year = :month_year';
+                        Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"';
             
             //PREPARA A QUERY
             $stmt = $this->conn->prepare($query);
@@ -95,7 +100,7 @@
             $stmt->bindParam(':current_value', $this->Budget_Current_Value);
             $stmt->bindParam(':family_id', $this->Family_ID);
             $stmt->bindParam(':budget_id', $this->Budget_Control_ID);
-            $stmt->bindParam(':month_year', $this->Budget_Month_Year);
+            $stmt->bindParam(':revenue_id', $this->Budget_Origin_ID);
 
              //EXECUTA A QUERY
              if($stmt->execute()) {
@@ -189,8 +194,9 @@
       public function getBudgets() {
         $query = 'SELECT 
                     b.Budget_Control_ID AS "Budget_Control_ID",
+                    b.Budget_Origin_ID AS "Budget_Origin_ID",
                     bc.Budget_Control_Description AS "Budget_Control_Description",
-                    SUM(b.Budget_Current_value) AS "Budget_Current_Value"
+                    b.Budget_Current_value AS "Budget_Current_Value"
                   FROM 
                     '.$this->table.' AS b
                   INNER JOIN 
@@ -200,9 +206,7 @@
                   WHERE 
                     b.Family_ID = :family_id 
                   AND
-                    b.Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"
-                  GROUP BY 
-                    b.Budget_Control_ID';
+                    b.Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"';
 
         //PREPARA A QUERY
         $stmt = $this->conn->prepare($query);
@@ -218,11 +222,12 @@
 
       public function getBudgetUsageData() {
         $query = 'SELECT 
+                    b.Budget_Control_ID AS "Budget_Control_ID",
                     bc.Budget_Control_Description AS "Budget_Description",
                     bc.Budget_Control_Icon_Name AS "Icon",
-                    b.Budget_Value AS "Total_Set",
-                      b.Budget_Current_Value AS "Total_Available",
-                      b.Budget_Value - b.Budget_Current_Value AS "Total_Used"
+                    SUM(b.Budget_Value) AS "Total_Set",
+                    SUM(b.Budget_Current_Value) AS "Total_Available",
+                    SUM(b.Budget_Value - b.Budget_Current_Value) AS "Total_Used"
                   FROM 
                     '.$this->table.' AS b
                   INNER JOIN
@@ -232,7 +237,8 @@
                   WHERE 
                     b.Family_ID = :family_id
                   AND
-                    b.Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"';
+                    b.Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"
+                  GROUP BY b.Budget_Control_ID';
 
         //PREPARA A QUERY
         $stmt = $this->conn->prepare($query);

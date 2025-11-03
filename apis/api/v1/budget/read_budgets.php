@@ -10,6 +10,9 @@
     //INSTACIA O OBJETO BUDGET
     $obBudget = new Budget($db);
 
+    //INSTANCIA O OBJETO REVENUE
+    $obRevenue = new Revenue($db);
+
     $data = explode('/', $_SERVER['REQUEST_URI']);
     $familyId = $data[count($data) - 3];
     $monthYear = $data[count($data) - 1];
@@ -27,9 +30,34 @@
         while($row = $result->fetch(PDO::FETCH_ASSOC)) {
             extract($row);
 
+            $obBudget->Budget_Control_ID = $Budget_Control_ID;
+
+            $budgetResult= $obBudget->getBudgetIdByPeriod();
+
+            $num = $budgetResult->rowCount();
+
+            $description;
+
+            if($num>1) {
+                $obRevenue->Revenue_ID = $Budget_Origin_ID;
+
+                $revenueResult = $obRevenue->getRevenueDescription();
+
+                while($revenueRow = $revenueResult->fetch(PDO::FETCH_ASSOC)) {
+                    extract($revenueRow);
+                    $revenue = $Revenue_Description;
+                    
+                }
+                $description = $Budget_Control_Description.'-'.$revenue;
+            } else {
+                $description = $Budget_Control_Description;
+            }
+
+
             $arr_budgets_item = array(
                 'budgetId' => $Budget_Control_ID,
-                'budgetDescription' => $Budget_Control_Description,
+                'revenueId' => $Budget_Origin_ID,
+                'budgetDescription' => $description,
                 'budgetCurrentValue' => floatval($Budget_Current_Value)
             );
 
