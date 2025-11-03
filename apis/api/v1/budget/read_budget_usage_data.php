@@ -42,17 +42,35 @@
             $arr_categories['categories'] = array();
 
             if($num>0) {
-                while($expenseRow = $expenseResult->fetch(PDO::FETCH_ASSOC)) {
-                    extract($expenseRow);
 
-                    $arr_categories_item = array(
-                        "category" => $Category,
-                        "percentage" => $Percentage,
-                        "value" => $Value
-                    );
+                if ($num==1) {
+                    while($expenseRow = $expenseResult->fetch(PDO::FETCH_ASSOC)) {
+                        extract($expenseRow);
 
-                    array_push($arr_categories['categories'], $arr_categories_item);
+                        $arr_categories_item = array(
+                            "category" => $Category,
+                            "percentage" => floatval($Percentage),
+                            "value" => floatval($Value)
+                        );
+
+                        array_push($arr_categories['categories'], $arr_categories_item);
+                    }
+                } else {
+                    $expenseResult = $obExpense->getCategoriesValue2();
+
+                    while($expenseRow = $expenseResult->fetch(PDO::FETCH_ASSOC)) {
+                        extract($expenseRow);
+
+                        $arr_categories_item = array(
+                            "category" => $Category,
+                            "percentage" => $Percentage,
+                            "value" => floatval($Value)
+                        );
+
+                        array_push($arr_categories['categories'], $arr_categories_item);
+                    }
                 }
+                
             }
 
 
