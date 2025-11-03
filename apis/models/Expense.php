@@ -118,6 +118,35 @@
 
         return $stmt;
       }
+
+      public function getCategoriesValue() {
+        $query = 'SELECT 
+                    exc.Expense_Category_Description AS "Category",
+                    ROUND(SUM(ex.Expense_Value)/bd.Budget_Value, 2) AS "Percentage",
+                    SUM(ex.Expense_Value) AS "Value"
+                  FROM `Expense` AS ex
+                  INNER JOIN `Expense_Category` AS exc
+                  ON ex.Expense_Category_ID = exc.Expense_Category_ID
+                  INNER JOIN `Budget`AS bd
+                  ON ex.Budget_ID = bd.Budget_Control_ID
+                  AND bd.Budget_Month_Year LIKE "%'.$this->Expense_Billing_Month_Year.'"
+                  WHERE ex.Budget_ID = :budget_id
+                  AND ex.Expense_Billing_Month_Year LIKE "%'.$this->Expense_Billing_Month_Year.'"
+                  AND ex.Family_ID = :family_id
+                  GROUP BY ex.Expense_Category_ID';
+        
+        //PREPARA A QUERY
+        $stmt = $this->conn->prepare($query);
+
+        //LIGA OS DADOS 
+        $stmt->bindParam(':budget_id', $this->Budget_ID);
+        $stmt->bindParam(':family_id', $this->Family_ID);
+
+        //EXECUTA A QUERY
+        $stmt->execute();
+
+        return $stmt;
+      }
     }
 
 ?>

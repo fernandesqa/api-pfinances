@@ -61,11 +61,11 @@
     $currentYear = date('Y');
     $statementDate = '';
 
-    if(intval($month)==intval($currentMonth) && instval($year)==intval($currentYear)) {
+    if(intval($month)==intval($currentMonth) && intval($year)==intval($currentYear)) {
         if(strlen($month)==1) {
             $statementDate = $currentDay.'/'.'0'.$currentMonth.'/'.$currentYear;    
         } else {
-            $statementDate = $currentDay.'/'.$currentMonth.'/'.$currentMonth;
+            $statementDate = $currentDay.'/'.$currentMonth.'/'.$currentYear;
         }
     } else {
         if(strlen($month)==1) {
@@ -699,6 +699,8 @@
                                         }
                                     }
                                 }
+                            } else {
+                                $finalResult = true;
                             }
                         } else {
                             $finalResult = false;
@@ -793,11 +795,11 @@
                     //ATUALIZA O VALOR DA RECEITA OU DO REGISTRO DE ECONOMIA
                     if($data->budgets[$i]->revenue) {
                         $result = $obRevenue->updateRevenueCurrentValue();
-
+                        
                         if($result) {
                             //REGISTRA OS DADOS NO EXTRATO
-                            $result = $obStatement->savingsCreation();
-
+                            $result = $obStatement->revenueCreation();
+                            
                             if($result) {
                                 $finalResult = true;
                             } else {
