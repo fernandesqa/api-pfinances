@@ -171,6 +171,7 @@
             $obBudget->Budget_Current_Value = $updatedValue;
 
             $result = $obExpense->createExpense();
+            
             if($result) {
                 // ATUALIZA O VALOR DO ORÇAMENTO
                 $result = $obBudget->updateBudgetCurrentValue();
