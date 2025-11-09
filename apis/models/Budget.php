@@ -80,6 +80,35 @@
             return $stmt;
         }
 
+        public function getBudgetValues() {
+          $query = 'SELECT 
+                        Budget_Current_Value,
+                        Budget_Value 
+                      FROM 
+                        '.$this->table.' 
+                      WHERE 
+                        Budget_Control_ID = :budget_id
+                      AND
+                        Budget_Origin_ID = :revenue_id
+                      AND
+                        Family_ID = :family_id 
+                      AND
+                        Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"';
+
+            //PREPARA A QUERY
+            $stmt = $this->conn->prepare($query);
+
+            //LIGA OS DADOS
+            $stmt->bindParam(':family_id', $this->Family_ID);
+            $stmt->bindParam(':budget_id', $this->Budget_Control_ID);
+            $stmt->bindParam(':revenue_id', $this->Budget_Origin_ID);
+
+            //EXECUTA A QUERY
+            $stmt->execute();
+
+            return $stmt;
+        }
+
         public function updateBudgetCurrentValue() {
             $query = 'UPDATE '.$this->table.'
                       SET 
@@ -275,6 +304,72 @@
         $stmt->execute();
 
         return $stmt;
+      }
+
+      //Atualiza o valor atual do orçamento que realiza a transferência de valor para outro orçamento
+      public function updateWithdrawBudget() {
+        $query = 'UPDATE '.$this->table.' 
+                  SET 
+                    Budget_Current_Value = :current_value 
+                  WHERE 
+                    Budget_Control_ID = :budget_id
+                  AND
+                    Budget_Origin_ID = :revenue_id
+                  AND
+                    Family_ID = :family_id
+                  AND 
+                    Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"';
+
+        //PREPARA A QUERY
+        $stmt = $this->conn->prepare($query);
+
+        //LIGA OS DADOS
+        $stmt->bindParam(':current_value', $this->Budget_Current_Value);
+        $stmt->bindParam(':family_id', $this->Family_ID);
+        $stmt->bindParam(':budget_id', $this->Budget_Control_ID);
+        $stmt->bindParam(':revenue_id', $this->Budget_Origin_ID);
+
+        //EXECUTA A QUERY
+        if($stmt->execute()) {
+          return true;
+        }
+        //EXIBE ERRO SE ALGO DER ERRADO
+        printf("Error: %s.\n", $stmt->error);
+        return false;
+      }
+
+      //Atualiza os valores do orçamento que recebe a transferência de valor de outro orçamento
+      public function updateDestinationBudget() {
+        $query = 'UPDATE '.$this->table.' 
+                  SET 
+                    Budget_Current_Value = :current_value,
+                    Budget_Value = :value
+                  WHERE 
+                    Budget_Control_ID = :budget_id
+                  AND
+                    Budget_Origin_ID = :revenue_id
+                  AND
+                    Family_ID = :family_id
+                  AND 
+                    Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"';
+                    
+        //PREPARA A QUERY
+        $stmt = $this->conn->prepare($query);
+
+        //LIGA OS DADOS
+        $stmt->bindParam(':current_value', $this->Budget_Current_Value);
+        $stmt->bindParam(':value', $this->Budget_Value);
+        $stmt->bindParam(':family_id', $this->Family_ID);
+        $stmt->bindParam(':budget_id', $this->Budget_Control_ID);
+        $stmt->bindParam(':revenue_id', $this->Budget_Origin_ID);
+
+        //EXECUTA A QUERY
+        if($stmt->execute()) {
+          return true;
+        }
+        //EXIBE ERRO SE ALGO DER ERRADO
+        printf("Error: %s.\n", $stmt->error);
+        return false;
       }
     }
 
