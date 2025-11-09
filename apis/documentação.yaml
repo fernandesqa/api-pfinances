@@ -1607,6 +1607,55 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalError'
                 
+  /transfer-budget/users/{userId}/families/{familyId}:
+    post:
+      tags:
+        - Orçamentos
+      summary: Transfere o valor de um orçamento para outro
+      description: Realiza a transferência de valor entre orçamentos
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Realiza a transferência de valor entre orçamentos
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferBudget'
+          application/xml:
+              schema:
+                $ref: '#/components/schemas/TransferBudget'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetTransfered'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/BudgetTransfered'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
   /savings/users/{userId}/families/{familyId}/periods/{monthYear}/create:
     post:
       tags:
@@ -2748,3 +2797,38 @@ components:
                     value:
                       type: number
                       example: 250.75
+  
+  
+    TransferBudget:
+      type: object
+      properties:
+        budgetWithdrawRevenueId:
+          type: number
+        budgetWithdrawId:
+          type: number
+        budgetWithdrawDescription:
+          type: string
+        budgetWithdrawMonthYear:
+          type: string
+          example: "112025"
+        budgetDestinationRevenueId:
+          type: number
+        budgetDestinationId:
+          type: integer
+        budgetDestinationDescription:
+          type: string
+        budgetDestinationMonthYear:
+          type: string
+          example: "112025"
+        value:
+          type: number
+          example: 125.63
+          
+    BudgetTransfered:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Transferência realizada com sucesso.
+  
+    
