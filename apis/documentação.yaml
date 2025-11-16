@@ -1656,6 +1656,60 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalError'
                 
+  /increase-budget/users/{userId}/families/{familyId}/periods/{monthYear}:
+    patch:
+      tags:
+        - Orçamentos
+      summary: Aumenta o valor de um orçamento
+      description: Realiza o aumento de valor de um orçamento
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: monthYear
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Realiza o aumento de valor de um orçamento
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncreaseBudget'
+          application/xml:
+              schema:
+                $ref: '#/components/schemas/IncreaseBudget'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetIncreased'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/BudgetIncreased'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+                
   /savings/users/{userId}/families/{familyId}/periods/{monthYear}/create:
     post:
       tags:
@@ -2831,4 +2885,27 @@ components:
           type: string
           example: Transferência realizada com sucesso.
   
+    IncreaseBudget:
+      type: object
+      properties:
+        revenueSourceId:
+          type: number
+        revenueSourceDescription:
+          type: string
+        budgetId:
+          type: number
+        budgetRevenueId:
+          type: number
+        budgetDescription:
+          type: string
+        value:
+          type: number
+          example: 425.85
+          
+    BudgetIncreased:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Orçamento aumentado com sucesso.
     
