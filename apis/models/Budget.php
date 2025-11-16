@@ -143,8 +143,7 @@
       public function updateBudgetValues() {
           $query = 'UPDATE '.$this->table.'
                     SET 
-                      Budget_Current_Value = :current_value
-                    AND 
+                      Budget_Current_Value = :current_value, 
                       Budget_Value = :budget_value
                     WHERE 
                       Budget_Control_ID = :budget_id
