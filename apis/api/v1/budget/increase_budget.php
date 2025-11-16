@@ -157,19 +157,23 @@
     }
 
     // OBTÉM O VALOR ATUAL DO ORÇAMENTO E REALIZA O AUMENTO
-    $result = $obBudget->getBudgetCurrentValue();
+    $result = $obBudget->getBudgetValues();
 
     $currentValue;
+    $budgetValue;
     while($row = $result->fetch(PDO::FETCH_ASSOC)) {
         extract($row);
 
-        $currentValue = $Revenue_Current_Value;
+        $currentValue = $Budget_Current_Value;
+        $budgetValue = $Budget_Value;
     }
 
     $updatedValue = $currentValue + $value;
+    $newValue = $budgetValue + $value;
     $obBudget->Budget_Current_Value = $updatedValue;
+    $obBudget->Budget_Value = $newValue;
 
-    $result = $obBudget->updateBudgetCurrentValue();
+    $result = $obBudget->updateBudgetValues();
 
     if($result) {
         //REGISTRA OS DADOS NO EXTRATO
