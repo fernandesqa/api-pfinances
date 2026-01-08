@@ -286,14 +286,26 @@
         $query = 'SELECT 
                     b.Budget_Control_ID AS "Budget_Control_ID",
                     bc.Budget_Control_Description AS "Budget_Description",
-                    bc.Budget_Control_Icon_Name AS "Icon",
+                    bc.Budget_Control_Icon_Name AS "Icon", 
                     SUM(b.Budget_Value) AS "Total_Set",
-                    SUM(b.Budget_Current_Value) AS "Total_Available",
-                    SUM(b.Budget_Value - b.Budget_Current_Value) AS "Total_Used"
+                 (CASE 
+                    WHEN b.Budget_Control_ID IN (
+                        SELECT 
+                        	Budget_ID 
+                        FROM Expense WHERE Family_ID = :family_id AND Expense_Billing_Month_Year LIKE "%'.$this->Budget_Month_Year.'") THEN SUM(b.Budget_Value) - (SELECT SUM(Expense_Value) FROM Expense WHERE Budget_ID = b.Budget_Control_ID AND Family_ID = :family_id AND Expense_Billing_Month_Year LIKE "%'.$this->Budget_Month_Year.'")
+                    ELSE SUM(b.Budget_Current_Value) 
+                END) AS "Total_Available",
+                (CASE 
+                    WHEN b.Budget_Control_ID IN (
+                        SELECT 
+                        	Budget_ID 
+                        FROM Expense WHERE Family_ID = :family_id AND Expense_Billing_Month_Year LIKE "%'.$this->Budget_Month_Year.'") THEN (SELECT SUM(Expense_Value) FROM Expense WHERE Budget_ID = b.Budget_Control_ID AND Family_ID = :family_id AND Expense_Billing_Month_Year LIKE "%'.$this->Budget_Month_Year.'")
+                    ELSE SUM(b.Budget_Value - b.Budget_Current_Value) 
+                END) AS "Total_Used"
                   FROM 
-                    '.$this->table.' AS b
+                    Budget AS b
                   INNER JOIN
-                    `Budget_Control` AS bc
+                    Budget_Control AS bc
                   ON 
                     b.Budget_Control_ID = bc.Budget_Control_ID
                   WHERE 
