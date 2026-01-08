@@ -122,7 +122,16 @@
       public function getCategoriesValue() {
         $query = 'SELECT 
                     exc.Expense_Category_Description AS "Category",
-                    ROUND(SUM(ex.Expense_Value)/bd.Budget_Value, 2) AS "Percentage",
+                    ROUND(bd.Budget_Value / ((SELECT 
+                        SUM(Expense_Value)
+                     FROM 
+                       '.$this->table.' 
+                     WHERE 
+                        Budget_ID = :budget_id 
+                     AND 
+                        Family_ID = :family_id 
+                     AND 
+                        Expense_Billing_Month_Year LIKE "%'.$this->Expense_Billing_Month_Year.'")), 2) AS "Percentage",
                     (SELECT 
                         SUM(Expense_Value)
                      FROM 
@@ -160,7 +169,7 @@
       public function getCategoriesValue2() {
         $query = 'SELECT 
                     exc.Expense_Category_Description AS "Category",
-                    ROUND(SUM(ex.Expense_Value)/bd.Budget_Value, 2) AS "Percentage",
+                    Round((SUM(ex.Expense_Value))/bd.Budget_Value, 2) AS "Percentage",
                     SUM(Expense_Value) AS "Value"
                   FROM `Expense` AS ex
                   INNER JOIN `Expense_Category` AS exc

@@ -63,7 +63,7 @@
 
                         $arr_categories_item = array(
                             "category" => $Category,
-                            "percentage" => $Percentage,
+                            "percentage" => floatval($Percentage),
                             "value" => floatval($Value)
                         );
 
