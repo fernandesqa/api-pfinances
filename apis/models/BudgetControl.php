@@ -9,6 +9,9 @@
         public $Person_ID;
         public $Family_ID;
         public $Budget_Control_Description;
+        public $Budget_Control_Original_Value;
+        public $Budget_Control_Icon_Name;
+        public $Budget_Month_Year;
 
         // CONSTRUTOR COM BANCO DE DADOS
         public function __construct($db) {
@@ -21,12 +24,14 @@
                     (
                      Person_ID,
                      Family_ID,
-                     Budget_Control_Description
+                     Budget_Control_Description,
+                     Budget_Control_Original_Value
                     )
                      VALUES (
                      :person_id,
                      :family_id,
-                     :description
+                     :description,
+                     :value
                      )';
             //PREPARA A QUERY
             $stmt = $this->conn->prepare($query);
@@ -35,6 +40,7 @@
             $stmt->bindParam(':person_id', $this->Person_ID);
             $stmt->bindParam(':family_id', $this->Family_ID);
             $stmt->bindParam(':description', $this->Budget_Control_Description);
+            $stmt->bindParam(':value', $this->Budget_Control_Original_Value);
 
             //EXECUTA A QUERY
             if($stmt->execute()) {
@@ -109,6 +115,37 @@
         $stmt->execute();
 
         return $stmt;
+      }
+
+      public function getBudgetsNotSet() {
+        $query = 'SELECT 
+                    Budget_Control_Description, 
+                    Budget_Control_Original_Value 
+                  FROM 
+                    '.$this->table.' 
+                  WHERE 
+                    Family_ID = :family_id 
+                  AND 
+                    Budget_Control_ID NOT IN (
+                      SELECT 
+                            Budget_Control_ID 
+                          FROM 
+                            Budget 
+                          WHERE 
+                            Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"
+                      )';
+        
+        //PREPARA A QUERY
+        $stmt = $this->conn->prepare($query);
+
+        //LIGA OS DADOS 
+        $stmt->bindParam(':family_id', $this->Family_ID);
+
+        //EXECUTA A QUERY
+        $stmt->execute();
+
+        return $stmt;
+                    
       }
     }
 ?>

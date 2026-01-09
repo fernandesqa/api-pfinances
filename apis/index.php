@@ -1461,19 +1461,23 @@
             }
             break;
 
-        case str_contains($_SERVER['REQUEST_URI'], $prefixApi.'/list-previous-budgets/users'):
+        case str_contains($_SERVER['REQUEST_URI'], $prefixApi.'/list-budgets-not-set-on-period/users'):
             //VERIFICA O MÉTODO ENVIADO NA REQUEST
             switch($_SERVER['REQUEST_METHOD']) {
                 case 'GET':
                     $data = explode('/', $_SERVER['REQUEST_URI']);
-                    $userId = $data[count($data) - 3];
-                    $familyId = $data[count($data) - 1];
+                    $userId = $data[count($data) - 5];
+                    $familyId = $data[count($data) - 3];
+                    $monthYear = $data[count($data) - 1];
                     if($userId != 'users' && 
                         $userId != '/' && 
                         $userId != '' &&
                         $familyId != 'families' &&
                         $familyId != '/' &&
-                        $familyId != '') {
+                        $familyId != '' &&
+                        $monthYear != 'periods' &&
+                        $monthYear != '/' &&
+                        $monthYear != '') {
                             
                             //VALIDA O ACCESSTOKEN E ENTÃO BUSCA OS CONVITES
                             $all_headers = getallheaders();
@@ -1484,7 +1488,7 @@
                                 $obAccessToken->Session_Access_Token = $accessToken;
                                 if($obAccessToken->isTokenValid()) {
                                     //CONSULTA OS ORÇAMENTOS
-                                    require __DIR__ .'/api/v1/budget/read_previous_budgets.php';
+                                    require __DIR__ .'/api/v1/budget/read_budgets_not_set_already.php';
                                 } else {
                                     http_response_code(401);
                                     echo json_encode('Invalid token');    

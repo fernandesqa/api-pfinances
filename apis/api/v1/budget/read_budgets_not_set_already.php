@@ -8,27 +8,15 @@
     $db = $database->connection();
 
     //INSTACIA O OBJETO BUDGET
-    $obBudget = new Budget($db);
+    $obBudgetControl = new BudgetControl($db);
 
     $data = explode('/', $_SERVER['REQUEST_URI']);
-    $familyId = $data[count($data) - 1];
+    $familyId = $data[count($data) - 3];
 
-    $obBudget->Family_ID = $familyId;
-    $month;
-    $year;
-    date_default_timezone_set('America/Sao_Paulo');
-    if(date('m')-1 == 0) {
-        $month = date('m')-1;
-        $year = date('Y')-1;    
-    } else {
-        $month = date('m')-1;
-        $year = date('Y');    
-    }
+    $obBudgetControl->Family_ID = $familyId;
+    $obBudgetControl->Budget_Month_Year = $data[count($data) - 1];
     
-    $monthYear = $month.$year;
-    $obBudget->Budget_Month_Year = $monthYear;
-    
-    $result = $obBudget->getPreviousBudgets();
+    $result = $obBudgetControl->getBudgetsNotSet();
 
     $num = $result->rowCount();
 
@@ -40,8 +28,8 @@
             extract($row);
 
             $arr_budgets_item = array(
-                'budgetDescription' => $Description,
-                'budgetValue' => floatval($Budget_Value)
+                'budgetDescription' => $Budget_Control_Description,
+                'budgetValue' => floatval($Budget_Control_Original_Value)
             );
 
             array_push($arr_budgets['data'], $arr_budgets_item);
