@@ -127,6 +127,7 @@
         $obBudget->Budget_Value = $data->budgets[$i]->value;
         $obBudget->Budget_Current_Value = $data->budgets[$i]->value;
         $obBugetControl->Budget_Control_Description = $data->budgets[$i]->description;
+        $obBugetControl->Budget_Control_Original_Value = $data->budgets[$i]->value;
         $obStatement->Statement_Description = 'Destinação de valor para o orçamento "'.$data->budgets[$i]->description.'"';
         $obStatement->Statement_Value = '- '.$obGeneralFunctions->convertToMonetary((string)$data->budgets[$i]->value);
         $result = $obBugetControl->getBudgetByName();

@@ -1559,12 +1559,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalError'
                 
-  /list-previous-budgets/users/{userId}/families/{familyId}:
+  /list-budgets-not-set-on-period/users/{userId}/families/{familyId}/periods/{monthYear}:
     get:
       tags:
         - Orçamentos
-      summary: Consulta os orçamentos e valores definidos no mês anterior do ano atual
-      description: Realiza a consulta dos orçamentos e valores definidos no mês anterior do ano atual na base
+      summary: Consulta os orçamentos e valores ainda não definidos no mês e ano informado
+      description: Realiza a consulta dos orçamentos e valores ainda não definidos no mês e ano informado
       parameters:
         - name: userId
           in: path
@@ -1578,6 +1578,11 @@ paths:
           schema:
             type: integer
             format: int64
+        - name: monthYear
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Successful operation

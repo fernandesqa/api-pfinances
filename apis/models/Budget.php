@@ -224,35 +224,6 @@
         return $stmt;
       }
 
-      public function getPreviousBudgets() {
-        $query = 'SELECT 
-                    bc.Budget_Control_Description AS "Description",
-                    SUM(b.Budget_Value) AS "Budget_Value"
-                  FROM 
-                    '.$this->table.' AS b 
-                  INNER JOIN 
-                    Budget_Control AS bc
-                  ON 
-                    bc.Budget_Control_ID = b.Budget_Control_ID 
-                  WHERE 
-                    b.Family_ID = :family_id
-                  AND 
-                    b.Budget_Month_Year LIKE "%'.$this->Budget_Month_Year.'"
-                  GROUP BY 
-                    bc.Budget_Control_Description';
-
-        //PREPARA A QUERY
-        $stmt = $this->conn->prepare($query);
-
-        //LIGA OS DADOS
-        $stmt->bindParam(':family_id', $this->Family_ID);
-
-        //EXECUTA A QUERY
-        $stmt->execute();
-
-        return $stmt;
-      }
-
       public function getBudgets() {
         $query = 'SELECT 
                     b.Budget_Control_ID AS "Budget_Control_ID",
