@@ -1611,6 +1611,54 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/InternalError'
+
+  /get-all-budgets/users/{userId}/families/{familyId}:
+    get:
+      tags:
+        - Orçamentos
+      summary: Consulta os orçamentos e valores definidos pela família
+      description: Realiza a consulta dos orçamentos e valores definidos pela família
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviousBudgets'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/PreviousBudgets'
+        '404':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DataNotFound'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
                 
   /transfer-budget/users/{userId}/families/{familyId}:
     post:
@@ -1694,6 +1742,55 @@ paths:
           application/xml:
               schema:
                 $ref: '#/components/schemas/IncreaseBudget'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetIncreased'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/BudgetIncreased'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+
+  /set-new-budget-value/users/{userId}/families/{familyId}:
+    patch:
+      tags:
+        - Orçamentos
+      summary: Altera o valor de um orçamento
+      description: Realiza a alteração de valor de um orçamento
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: familyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Realiza o aumento de valor de um orçamento
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetNewBudgetValue'
+          application/xml:
+              schema:
+                $ref: '#/components/schemas/SetNewBudgetValue'
         required: true
       responses:
         '200':
@@ -2915,4 +3012,13 @@ components:
         message:
           type: string
           example: Orçamento aumentado com sucesso.
+    
+    SetNewBudgetValue:
+      type: object
+      properties:
+        budgetId:
+          type: number
+        value:
+          type: number
+          example: 425.85
     

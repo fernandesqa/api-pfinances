@@ -148,5 +148,53 @@
         return $stmt;
                     
       }
+
+    public function getAllBudgets() {
+        $query = 'SELECT
+                    Budget_Control_ID,
+                    Budget_Control_Description, 
+                    Budget_Control_Original_Value 
+                  FROM 
+                    '.$this->table.' 
+                  WHERE 
+                    Family_ID = :family_id';
+        
+        //PREPARA A QUERY
+        $stmt = $this->conn->prepare($query);
+
+        //LIGA OS DADOS 
+        $stmt->bindParam(':family_id', $this->Family_ID);
+
+        //EXECUTA A QUERY
+        $stmt->execute();
+
+        return $stmt;
+                    
+      }
+
+      public function setNewBudgetValue() {
+        $query = 'UPDATE  '.$this->table.'
+                    SET Budget_Control_Original_Value = :budget_value
+                  WHERE 
+                    Family_ID = :family_id
+                  AND
+                    Budget_Control_ID = :budget_id';
+
+        //PREPARA A QUERY
+        $stmt = $this->conn->prepare($query);
+
+        //LIGA OS DADOS
+        $stmt->bindParam(':family_id', $this->Family_ID);
+        $stmt->bindParam(':budget_id', $this->Budget_Control_ID);
+        $stmt->bindParam(':budget_value', $this->Budget_Control_Original_Value);
+
+        //EXECUTA A QUERY
+        if($stmt->execute()) {
+            return true;
+        }
+        //EXIBE ERRO SE ALGO DER ERRADO
+        printf("Error: %s.\n", $stmt->error);
+        return false;
+      }
     }
 ?>
