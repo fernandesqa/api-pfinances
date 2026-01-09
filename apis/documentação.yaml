@@ -2659,6 +2659,8 @@ components:
           items:
             type: object
             properties:
+              budgetId:
+                type: integer
               budgetDescription:
                 type: string
               budgetValue:
