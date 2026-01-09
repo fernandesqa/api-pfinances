@@ -28,6 +28,7 @@
             extract($row);
 
             $arr_budgets_item = array(
+                'budgetId' => intval($Budget_Control_ID),
                 'budgetDescription' => $Budget_Control_Description,
                 'budgetValue' => floatval($Budget_Control_Original_Value)
             );

@@ -118,7 +118,8 @@
       }
 
       public function getBudgetsNotSet() {
-        $query = 'SELECT 
+        $query = 'SELECT
+                    Budget_Control_ID,
                     Budget_Control_Description, 
                     Budget_Control_Original_Value 
                   FROM 
