@@ -129,7 +129,9 @@
                     AND
                       Family_ID = :family_id 
                     AND 
-                      Fixed_Expense_End_Month_Year != ""';
+                      Fixed_Expense_End_Month_Year != ""
+                    AND 
+                      Fixed_Expense_End_Month_Year >= :end_month_year';
           
           //PREPARA A QUERY
           $stmt = $this->conn->prepare($query);
@@ -137,6 +139,7 @@
           //LIGA OS DADOS
           $stmt->bindParam(':budget_id', $this->Budget_ID);
           $stmt->bindParam(':family_id', $this->Family_ID);
+          $stmt->bindParam(':end_month_year', $this->Fixed_Expense_End_Month_Year);
 
           //EXECUTA A QUERY
           $stmt->execute();
