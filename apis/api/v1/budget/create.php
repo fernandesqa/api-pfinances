@@ -46,14 +46,23 @@
     $userId = $url[count($url) - 6];
     $familyId = $url[count($url) - 4];
     $monthYear = $url[count($url) - 2];
+    $endMonth;
+    $endYear;
+    $endMonthYear;
+
 
     if(strlen($monthYear)==5) {
         $month = substr($monthYear, 0, 1);
+        $endMonth = '0'.$month;
         $year = substr($monthYear, 1, 5);
     } else {
         $month = substr($monthYear, 0, 2);
+        $endMonth = $month;
         $year = substr($monthYear, 2, 6);
     }
+
+    $endYear = $year;
+    $endMonthYear = $endMonth.$endYear;
 
     date_default_timezone_set('America/Sao_Paulo');
     $currentDay = date('d');
@@ -222,6 +231,7 @@
                             //VERIFICA SE HÁ DESPESAS FIXAS VINCULADAS AO ORÇAMENTO
                             $obFixedExpense->Budget_ID = $budgetId;
                             $obFixedExpense->Family_ID = $familyId;
+                            $obFixedExpense->Fixed_Expense_End_Month_Year = $endMonthYear;
 
                             $dateTime;
                             $month;
@@ -470,6 +480,7 @@
                             //VERIFICA SE HÁ DESPESAS FIXAS VINCULADAS AO ORÇAMENTO
                             $obFixedExpense->Budget_ID = $budgetId;
                             $obFixedExpense->Family_ID = $familyId;
+                            $obFixedExpense->Fixed_Expense_End_Month_Year = $endMonthYear;
 
                             $dateTime;
                             $month;
